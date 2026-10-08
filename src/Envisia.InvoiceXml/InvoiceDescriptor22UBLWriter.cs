@@ -1237,45 +1237,26 @@ namespace Envisia.InvoiceXml
 
         private bool _IsInvoiceAccordingToUBLSpecification(InvoiceType type)
         {
+            // UNTDID 1001 codes with the EN 16931 interpretation "credit note" are written as ubl:CreditNote,
+            // all other codes (EN 16931 interpretation "invoice") as ubl:Invoice.
             switch (type)
             {
-                case InvoiceType.RequestForPayment: // 71
-                case InvoiceType.DebitNoteRelatedToGoodsOrServices: // 80
-                case InvoiceType.MeteredServicesInvoice: // 82
-                case InvoiceType.DebitnoteRelatedToFinancialAdjustments: // 84
-                case InvoiceType.TaxNotification: // 102
-                case InvoiceType.FinalPaymentRequestBasedOnCompletionOfWork: // 218
-                case InvoiceType.PaymentRequestForCompletedUnits: // 219
-                case InvoiceType.PartialInvoice: // 326
-                case InvoiceType.CommercialInvoiceWithPackingList: // 331
-                case InvoiceType.Invoice: // 380
-                case InvoiceType.CommissionNote: // 382
-                case InvoiceType.DebitNote: // 383
-                case InvoiceType.Correction: // 384
-                case InvoiceType.PrepaymentInvoice: // 386
-                case InvoiceType.TaxInvoice: // 388
-                case InvoiceType.SelfBilledInvoice: // 389
-                case InvoiceType.FactoredInvoice: // 393
-                case InvoiceType.ConsignmentInvoice: // 395
-                case InvoiceType.ForwardersInvoiceDiscrepancyReport: // 553
-                case InvoiceType.InsurersInvoice: // 575
-                case InvoiceType.ForwardersInvoice: // 623
-                case InvoiceType.FreightInvoice: // 780
-                case InvoiceType.ClaimNotification: // 817
-                case InvoiceType.ConsularInvoice: // 870
-                case InvoiceType.PartialConstructionInvoice: // 875
-                case InvoiceType.PartialFinalConstructionInvoice: // 876
-                case InvoiceType.FinalConstructionInvoice: // 877
-                case InvoiceType.CustomsInvoice: // 935
-                    return true;
                 case InvoiceType.CreditNoteRelatedToGoodsOrServices: // 81
                 case InvoiceType.CreditNoteRelatedToFinancialAdjustments: // 83
+                case InvoiceType.SelfBilledCreditNote: // 261
+                case InvoiceType.ConsolidatedCreditNoteGoodsAndServices: // 262
+                case InvoiceType.CreditNoteForPriceVariation: // 296
+                case InvoiceType.DelcredereCreditNote: // 308
                 case InvoiceType.CreditNote: // 381
                 case InvoiceType.FactoredCreditNote: // 396
+                case InvoiceType.OcrPaymentCreditNote: // 420
+                case InvoiceType.ReversalOfCredit: // 458
+                case InvoiceType.SelfBilledFactoredCreditNote: // 502
+                case InvoiceType.PrepaymentCreditNoteCorrected: // 503
                 case InvoiceType.ForwardersCreditNote: // 532
                     return false;
                 default:
-                    throw new NotImplementedException($"Invoice type {type} not implemented in UBL writer.");
+                    return true;
             }
         } // !_IsInvoiceAccordingToUBLSpecification()
 

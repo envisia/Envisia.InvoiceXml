@@ -59,6 +59,38 @@ namespace Envisia.InvoiceXml.Tests
         } // !TestGeneratedUblIsSchemaValid()
 
 
+        public static IEnumerable<object[]> AllInvoiceTypes => Enum.GetValues(typeof(InvoiceType)).Cast<InvoiceType>().Select(t => new object[] { t });
+
+
+        /// <summary>
+        /// Every UNTDID 1001 code can be written in UBL: credit notes (EN 16931 interpretation) as ubl:CreditNote, everything else as ubl:Invoice.
+        /// </summary>
+        [TestMethod]
+        [DynamicData(nameof(AllInvoiceTypes))]
+        public void TestEveryInvoiceTypeCanBeWrittenInUbl(InvoiceType type)
+        {
+            InvoiceType[] creditNotes =
+            {
+                InvoiceType.CreditNoteRelatedToGoodsOrServices, InvoiceType.CreditNoteRelatedToFinancialAdjustments, InvoiceType.SelfBilledCreditNote,
+                InvoiceType.ConsolidatedCreditNoteGoodsAndServices, InvoiceType.CreditNoteForPriceVariation, InvoiceType.DelcredereCreditNote,
+                InvoiceType.CreditNote, InvoiceType.FactoredCreditNote, InvoiceType.OcrPaymentCreditNote, InvoiceType.ReversalOfCredit,
+                InvoiceType.SelfBilledFactoredCreditNote, InvoiceType.PrepaymentCreditNoteCorrected, InvoiceType.ForwardersCreditNote
+            };
+            bool isCreditNote = creditNotes.Contains(type);
+
+            InvoiceDescriptor desc = _InvoiceProvider.CreateInvoice();
+            desc.Type = type;
+
+            using MemoryStream ms = new MemoryStream();
+            desc.Save(ms, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL);
+
+            StringAssert.Contains(Encoding.UTF8.GetString(ms.ToArray()), isCreditNote ? "<ubl:CreditNote" : "<ubl:Invoice");
+            List<string> errors = SchemaValidator.Validate(ms, SchemaValidator.GetUblSchemaPath(isCreditNote));
+            Assert.IsEmpty(errors, string.Join(Environment.NewLine, errors));
+            Assert.AreEqual(type, InvoiceDescriptor.Load(ms).Type);
+        } // !TestEveryInvoiceTypeCanBeWrittenInUbl()
+
+
         [TestMethod]
         [DynamicData(nameof(UblDemoInvoices))]
         public void TestUblDemoInvoiceRoundTripIsSchemaValid(string fileName)
