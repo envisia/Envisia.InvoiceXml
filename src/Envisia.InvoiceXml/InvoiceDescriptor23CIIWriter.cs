@@ -217,7 +217,7 @@ namespace Envisia.InvoiceXml
                 {
                     foreach (var productCharacteristic in tradeLineItem.ApplicableProductCharacteristics)
                     {
-                        _Writer.WriteStartElement("ram", "ApplicableProductCharacteristic");
+                        _Writer.WriteStartElement("ram", "ApplicableProductCharacteristic", PROFILE_COMFORT_EXTENDED_XRECHNUNG);
                         // TODO: TypeCode        // BT-X-11, Art der Produkteigenschaft (Code), Extended
                         _Writer.WriteOptionalElementString("ram", "Description", productCharacteristic.Description);
                         // TODO: ValueMeasure    // BT-X-12, Wert der Produkteigenschaft (numerische Messgröße), mit unitCode, Extended
@@ -244,7 +244,7 @@ namespace Envisia.InvoiceXml
 
                     _Writer.WriteValue(designatedProductClassification.ClassCode);
                     _Writer.WriteEndElement(); // !ram::ClassCode
-                    _Writer.WriteOptionalElementString("ram", "ClassName", designatedProductClassification.ClassName);
+                    _Writer.WriteOptionalElementString("ram", "ClassName", designatedProductClassification.ClassName, Profile.Extended | Profile.XRechnung1 | Profile.XRechnung); // not part of the Factur-X EN 16931 schema
                     _Writer.WriteEndElement(); // !ram:DesignatedProductClassification
                 }
 
@@ -383,7 +383,7 @@ namespace Envisia.InvoiceXml
                     bool hasGrossUnitPrice = tradeLineItem.GrossUnitPrice.HasValue;
                     bool hasAllowanceCharges = tradeLineItem.GetTradeAllowanceCharges().Count > 0;
 
-                    if ((descriptor.Profile == Profile.XRechnung) || (descriptor.Profile == Profile.XRechnung1) || (descriptor.Profile == Profile.Comfort))
+                    if ((descriptor.Profile == Profile.XRechnung) || (descriptor.Profile == Profile.XRechnung1) || (descriptor.Profile == Profile.Comfort) || (descriptor.Profile == Profile.Basic))
                     {
                         // PEPPOL-EN16931-R046: For XRechnung, both must be present
                         needToWriteGrossUnitPrice = hasGrossUnitPrice && hasAllowanceCharges;
@@ -396,16 +396,24 @@ namespace Envisia.InvoiceXml
 
                     if (needToWriteGrossUnitPrice)
                     {
-                        _Writer.WriteStartElement("ram", "GrossPriceProductTradePrice", PROFILE_COMFORT_EXTENDED_XRECHNUNG);
+                        _Writer.WriteStartElement("ram", "GrossPriceProductTradePrice", Profile.Basic | PROFILE_COMFORT_EXTENDED_XRECHNUNG);
                         _writeOptionalAdaptiveAmount(_Writer, "ram", "ChargeAmount", tradeLineItem.GrossUnitPrice, 2, 4);   // BT-148
                         if (tradeLineItem.GrossQuantity.HasValue)
                         {
                             _writeElementWithAttributeWithPrefix(_Writer, "ram", "BasisQuantity", "unitCode", tradeLineItem.UnitCode.EnumToString(), _formatDecimal(tradeLineItem.GrossQuantity.Value, 4));
                         }
 
-                        foreach (AbstractTradeAllowanceCharge tradeAllowanceCharge in tradeLineItem.GetTradeAllowanceCharges()) // BT-147
+                        if (descriptor.Profile == Profile.Extended)
                         {
-                            _WriteItemLevelAppliedTradeAllowanceCharge(_Writer, tradeAllowanceCharge);
+                            foreach (AbstractTradeAllowanceCharge tradeAllowanceCharge in tradeLineItem.GetTradeAllowanceCharges()) // BT-147
+                            {
+                                _WriteItemLevelAppliedTradeAllowanceCharge(_Writer, tradeAllowanceCharge);
+                            }
+                        }
+                        else
+                        {
+                            // BASIC, EN 16931 and XRechnung know a single item price discount (BT-147) only
+                            _WriteItemLevelAppliedTradeAllowanceCharge(_Writer, _GetAggregatedItemPriceDiscount(tradeLineItem));
                         }
 
                         _Writer.WriteEndElement(); // ram:GrossPriceProductTradePrice(Comfort|Extended|XRechnung)
@@ -669,7 +677,14 @@ namespace Envisia.InvoiceXml
             _writeOptionalParty(_Writer, PartyTypes.BuyerTradeParty, this._Descriptor.Buyer, ALL_PROFILES, this._Descriptor.BuyerContact, this._Descriptor.BuyerElectronicAddress, this._Descriptor.BuyerTaxRegistration);
             #endregion
 
+            #region SellerTaxRepresentativeTradeParty
+            // BT-63: the tax taxRegistration of the SellerTaxRepresentativeTradeParty
+            // BG-11 (SellerTaxRepresentativeTradeParty)
+            _writeOptionalParty(_Writer, PartyTypes.SellerTaxRepresentativeTradeParty, this._Descriptor.SellerTaxRepresentative, ALL_PROFILES ^ Profile.Minimum, null, null, this._Descriptor.SellerTaxRepresentativeTaxRegistration);
+            #endregion
+
             #region ApplicableTradeDeliveryTerms
+            // order as required by the schema: after the tax representative, before the referenced documents
             if (_Descriptor.ApplicableTradeDeliveryTermsCode.HasValue)
             {
                 // BG-X-22, BT-X-145
@@ -677,12 +692,6 @@ namespace Envisia.InvoiceXml
                 _Writer.WriteElementString("ram", "DeliveryTypeCode", EnumExtensions.EnumToString<TradeDeliveryTermCodes>(this._Descriptor.ApplicableTradeDeliveryTermsCode));
                 _Writer.WriteEndElement(); // !ApplicableTradeDeliveryTerms
             }
-            #endregion
-
-            #region SellerTaxRepresentativeTradeParty
-            // BT-63: the tax taxRegistration of the SellerTaxRepresentativeTradeParty
-            // BG-11 (SellerTaxRepresentativeTradeParty)
-            _writeOptionalParty(_Writer, PartyTypes.SellerTaxRepresentativeTradeParty, this._Descriptor.SellerTaxRepresentative, ALL_PROFILES, null, null, this._Descriptor.SellerTaxRepresentativeTaxRegistration);
             #endregion
 
             #region 1. SellerOrderReferencedDocument (BT-14-00: Comfort+)
@@ -728,7 +737,7 @@ namespace Envisia.InvoiceXml
             // BT-12
             if (this._Descriptor.ContractReferencedDocument != null)
             {
-                _Writer.WriteStartElement("ram", "ContractReferencedDocument");
+                _Writer.WriteStartElement("ram", "ContractReferencedDocument", ALL_PROFILES ^ Profile.Minimum);
                 _Writer.WriteElementString("ram", "IssuerAssignedID", this._Descriptor.ContractReferencedDocument.ID);
                 if (this._Descriptor.ContractReferencedDocument.IssueDateTime.HasValue)
                 {
@@ -772,6 +781,7 @@ namespace Envisia.InvoiceXml
             #region ApplicableHeaderTradeDelivery
             _WriteComment(_Writer, options, InvoiceCommentConstants.ApplicableHeaderTradeDeliveryComment);
             _Writer.WriteStartElement("ram", "ApplicableHeaderTradeDelivery");
+            _Writer.WritePendingStartElements(); // mandatory in all profiles, always empty in MINIMUM
 
             //RelatedSupplyChainConsignment --> SpecifiedLogisticsTransportMovement --> ModeCode // Only in extended profile
             if (this._Descriptor.TransportMode != null)
@@ -790,7 +800,7 @@ namespace Envisia.InvoiceXml
             #region ActualDeliverySupplyChainEvent
             if (this._Descriptor.ActualDeliveryDate.HasValue)
             {
-                _Writer.WriteStartElement("ram", "ActualDeliverySupplyChainEvent");
+                _Writer.WriteStartElement("ram", "ActualDeliverySupplyChainEvent", ALL_PROFILES ^ Profile.Minimum);
                 _Writer.WriteStartElement("ram", "OccurrenceDateTime");
                 _Writer.WriteStartElement("udt", "DateTimeString");
                 _Writer.WriteAttributeString("format", "102");
@@ -997,9 +1007,10 @@ namespace Envisia.InvoiceXml
                     }
 
                     _Writer.WriteStartElement("ram", "PayerPartyDebtorFinancialAccount", ALL_PROFILES ^ Profile.Minimum);
-                    _Writer.WriteElementString("ram", "IBANID", account.IBAN);
-                    _Writer.WriteOptionalElementString("ram", "AccountName", account.Name, PROFILE_COMFORT_EXTENDED_XRECHNUNG);
-                    _Writer.WriteOptionalElementString("ram", "ProprietaryID", account.ID);
+                    _Writer.WriteElementString("ram", "IBANID", account.IBAN); // BT-91
+                    // The debtor account name was added to EXTENDED with Factur-X 1.09 / ZUGFeRD 2.5,
+                    // the other profiles only know the IBAN of the debtor account.
+                    _Writer.WriteOptionalElementString("ram", "AccountName", account.Name, Profile.Extended);
                     _Writer.WriteEndElement(); // !PayerPartyDebtorFinancialAccount
 
                     _Writer.WriteEndElement(); // !SpecifiedTradeSettlementPaymentMeans
@@ -1045,10 +1056,24 @@ namespace Envisia.InvoiceXml
                 _WriteDocumentLevelSpecifiedTradeAllowanceCharge(_Writer, tradeCharge);
             }
 
-            //  14. SpecifiedLogisticsServiceCharge (optional)
+            //  14. SpecifiedLogisticsServiceCharge (optional, EXTENDED only)
+            //  The other profiles do not know logistics service charges. They are written as document level
+            //  charges (BG-21) instead, which keeps them part of BT-108 (sum of charges on document level).
             foreach (ServiceCharge serviceCharge in this._Descriptor.GetLogisticsServiceCharges())
             {
-                _Writer.WriteStartElement("ram", "SpecifiedLogisticsServiceCharge", ALL_PROFILES ^ (Profile.XRechnung1 | Profile.XRechnung));
+                if (this._Descriptor.Profile != Profile.Extended)
+                {
+                    _WriteDocumentLevelSpecifiedTradeAllowanceCharge(_Writer, new TradeCharge()
+                    {
+                        ActualAmount = serviceCharge.Amount,
+                        Currency = this._Descriptor.Currency,
+                        Reason = serviceCharge.Description,
+                        Tax = serviceCharge.Tax
+                    });
+                    continue;
+                }
+
+                _Writer.WriteStartElement("ram", "SpecifiedLogisticsServiceCharge", Profile.Extended);
                 _Writer.WriteOptionalElementString("ram", "Description", serviceCharge.Description);
                 _Writer.WriteElementString("ram", "AppliedAmount", _formatDecimal(serviceCharge.Amount));
                 if (serviceCharge.Tax != null)
@@ -1204,17 +1229,27 @@ namespace Envisia.InvoiceXml
                     }
                     break;
                 default:
-                    foreach (PaymentTerms paymentTerms in this._Descriptor.GetTradePaymentTerms())
                     {
+                        // BASIC WL, BASIC and EN 16931 allow a single SpecifiedTradePaymentTerms element:
+                        // all descriptions are combined into BT-20, the first due date is used as BT-9.
+                        IList<PaymentTerms> allPaymentTerms = this._Descriptor.GetTradePaymentTerms();
+                        string mandateReference = _Descriptor.PaymentMeans?.SEPAMandateReference;
+                        if (allPaymentTerms.Count == 0 && String.IsNullOrWhiteSpace(mandateReference))
+                        {
+                            break;
+                        }
+
                         _Writer.WriteStartElement("ram", "SpecifiedTradePaymentTerms");
-                        _Writer.WriteOptionalElementString("ram", "Description", paymentTerms.Description, ALL_PROFILES ^ Profile.Minimum);
-                        if (paymentTerms.DueDate.HasValue)
+                        string description = String.Join("\n", allPaymentTerms.Select(p => p.Description?.Trim()).Where(d => !String.IsNullOrWhiteSpace(d)));
+                        _Writer.WriteOptionalElementString("ram", "Description", description, ALL_PROFILES ^ Profile.Minimum);
+                        DateTime? dueDate = allPaymentTerms.FirstOrDefault(p => p.DueDate.HasValue)?.DueDate;
+                        if (dueDate.HasValue)
                         {
                             _Writer.WriteStartElement("ram", "DueDateDateTime", ALL_PROFILES ^ Profile.Minimum);
-                            _writeElementWithAttributeWithPrefix(_Writer, "udt", "DateTimeString", "format", "102", _formatDate(paymentTerms.DueDate.Value));
+                            _writeElementWithAttributeWithPrefix(_Writer, "udt", "DateTimeString", "format", "102", _formatDate(dueDate.Value));
                             _Writer.WriteEndElement(); // !ram:DueDateDateTime
                         }
-                        _Writer.WriteOptionalElementString("ram", "DirectDebitMandateID", _Descriptor.PaymentMeans?.SEPAMandateReference, ALL_PROFILES ^ Profile.Minimum);
+                        _Writer.WriteOptionalElementString("ram", "DirectDebitMandateID", mandateReference, ALL_PROFILES ^ Profile.Minimum);
                         _Writer.WriteEndElement(); // !ram:SpecifiedTradePaymentTerms
                     }
                     break;
@@ -1254,7 +1289,7 @@ namespace Envisia.InvoiceXml
 
             _writeOptionalAmount(_Writer, "ram", "RoundingAmount", this._Descriptor.RoundingAmount, profile: Profile.Comfort | Profile.Extended | Profile.XRechnung1 | Profile.XRechnung);  // RoundingAmount  //Rundungsbetrag
             _writeOptionalAmount(_Writer, "ram", "GrandTotalAmount", this._Descriptor.GrandTotalAmount);                                // Rechnungsgesamtbetrag einschließlich Umsatzsteuer
-            _writeOptionalAmount(_Writer, "ram", "TotalPrepaidAmount", this._Descriptor.TotalPrepaidAmount);                            // Vorauszahlungsbetrag
+            _writeOptionalAmount(_Writer, "ram", "TotalPrepaidAmount", this._Descriptor.TotalPrepaidAmount, profile: ALL_PROFILES ^ Profile.Minimum);                            // Vorauszahlungsbetrag
             _writeOptionalAmount(_Writer, "ram", "DuePayableAmount", this._Descriptor.DuePayableAmount);                                // Fälliger Zahlungsbetrag
             _Writer.WriteEndElement(); // !ram:SpecifiedTradeSettlementMonetarySummation
             #endregion
@@ -1521,6 +1556,32 @@ namespace Envisia.InvoiceXml
         } // !_WriteItemLevelSpecifiedTradeAllowanceCharge()
 
 
+        /// <summary>
+        /// Combines the gross price allowances and charges of a line into the single item price discount (BT-147)
+        /// that is supported outside of the EXTENDED profile. Returns null if there is no positive discount.
+        /// </summary>
+        private TradeAllowance _GetAggregatedItemPriceDiscount(TradeLineItem tradeLineItem)
+        {
+            IList<AbstractTradeAllowanceCharge> allowanceCharges = tradeLineItem.GetTradeAllowanceCharges();
+            if (allowanceCharges.Count == 1 && !allowanceCharges[0].ChargeIndicator)
+            {
+                return (TradeAllowance)allowanceCharges[0];
+            }
+
+            decimal discount = allowanceCharges.Sum(ac => ac.ChargeIndicator ? -ac.ActualAmount : ac.ActualAmount);
+            if (discount <= 0m)
+            {
+                return null;
+            }
+
+            return new TradeAllowance()
+            {
+                ActualAmount = discount,
+                Currency = this._Descriptor.Currency
+            };
+        } // !_GetAggregatedItemPriceDiscount()
+
+
         private void _WriteItemLevelAppliedTradeAllowanceCharge(ProfileAwareXmlTextWriter writer, AbstractTradeAllowanceCharge tradeAllowanceCharge)
         {
             if (tradeAllowanceCharge == null)
@@ -1738,7 +1799,7 @@ namespace Envisia.InvoiceXml
             this._Descriptor.GetApplicableTradeTaxes()?.ForEach(tax =>
             {
                 _WriteComment(writer, options, InvoiceCommentConstants.ApplicableTradeTaxComment);
-                writer.WriteStartElement("ram", "ApplicableTradeTax");
+                writer.WriteStartElement("ram", "ApplicableTradeTax", ALL_PROFILES ^ Profile.Minimum);
 
                 writer.WriteStartElement("ram", "CalculatedAmount");
                 writer.WriteValue(_formatDecimal(tax.TaxAmount));
@@ -1933,14 +1994,15 @@ namespace Envisia.InvoiceXml
                     return;
             }
 
+            // MINIMUM only knows name, legal organization, country and tax registrations of a party
             if (!string.IsNullOrWhiteSpace(party.ID?.ID))
             {
-                writer.WriteOptionalElementString("ram", "ID", party.ID.ID);
+                writer.WriteOptionalElementString("ram", "ID", party.ID.ID, ALL_PROFILES ^ Profile.Minimum);
             }
 
             if (!String.IsNullOrWhiteSpace(party.GlobalID?.ID) && party.GlobalID.SchemeID.HasValue)
             {
-                writer.WriteStartElement("ram", "GlobalID");
+                writer.WriteStartElement("ram", "GlobalID", ALL_PROFILES ^ Profile.Minimum);
                 writer.WriteAttributeString("schemeID", party.GlobalID.SchemeID.Value.EnumToString());
                 writer.WriteValue(party.GlobalID.ID);
                 writer.WriteEndElement();
@@ -1953,29 +2015,31 @@ namespace Envisia.InvoiceXml
             _writeOptionalContact(writer, "ram", "DefinedTradeContact", contact, PROFILE_COMFORT_EXTENDED_XRECHNUNG);
 
             // spec 2.3 says: Minimum/BuyerTradeParty does not include PostalTradeAddress
-            if ((this._Descriptor.Profile == Profile.Extended) || partyType.In(PartyTypes.BuyerTradeParty, PartyTypes.SellerTradeParty, PartyTypes.SellerTaxRepresentativeTradeParty, PartyTypes.BuyerTaxRepresentativeTradeParty, PartyTypes.ShipToTradeParty, PartyTypes.ShipToTradeParty, PartyTypes.UltimateShipToTradeParty, PartyTypes.SalesAgentTradeParty))
+            bool isMinimumBuyer = (this._Descriptor.Profile == Profile.Minimum) && (partyType == PartyTypes.BuyerTradeParty);
+            if (!isMinimumBuyer && ((this._Descriptor.Profile == Profile.Extended) || partyType.In(PartyTypes.BuyerTradeParty, PartyTypes.SellerTradeParty, PartyTypes.SellerTaxRepresentativeTradeParty, PartyTypes.BuyerTaxRepresentativeTradeParty, PartyTypes.ShipToTradeParty, PartyTypes.ShipToTradeParty, PartyTypes.UltimateShipToTradeParty, PartyTypes.SalesAgentTradeParty)))
             {
+                // MINIMUM: the seller address consists of the country only (BT-40)
                 writer.WriteStartElement("ram", "PostalTradeAddress");
-                writer.WriteOptionalElementString("ram", "PostcodeCode", party.Postcode); // buyer: BT-53
+                writer.WriteOptionalElementString("ram", "PostcodeCode", party.Postcode, ALL_PROFILES ^ Profile.Minimum); // buyer: BT-53
                 string lineOneValue = !string.IsNullOrWhiteSpace(party.Street2) ? party.Street2 : (!string.IsNullOrWhiteSpace(party.ContactName) ? party.ContactName : party.Street);
                 string lineTwoValue = (!string.IsNullOrWhiteSpace(party.Street2) || !string.IsNullOrWhiteSpace(party.ContactName)) ? party.Street : null;
-                writer.WriteOptionalElementString("ram", "LineOne", lineOneValue); // buyer: BT-50
-                writer.WriteOptionalElementString("ram", "LineTwo", lineTwoValue); // buyer: BT-51
-                writer.WriteOptionalElementString("ram", "LineThree", party.AddressLine3); // buyer: BT-163
-                writer.WriteOptionalElementString("ram", "CityName", party.City); // buyer: BT-52
+                writer.WriteOptionalElementString("ram", "LineOne", lineOneValue, ALL_PROFILES ^ Profile.Minimum); // buyer: BT-50
+                writer.WriteOptionalElementString("ram", "LineTwo", lineTwoValue, ALL_PROFILES ^ Profile.Minimum); // buyer: BT-51
+                writer.WriteOptionalElementString("ram", "LineThree", party.AddressLine3, ALL_PROFILES ^ Profile.Minimum); // buyer: BT-163
+                writer.WriteOptionalElementString("ram", "CityName", party.City, ALL_PROFILES ^ Profile.Minimum); // buyer: BT-52
 
                 if (party.Country != null)
                 {
                     writer.WriteElementString("ram", "CountryID", party.Country.Value.EnumToString()); // buyer: BT-55
                 }
 
-                writer.WriteOptionalElementString("ram", "CountrySubDivisionName", party.CountrySubdivisionName); // BT-79
+                writer.WriteOptionalElementString("ram", "CountrySubDivisionName", party.CountrySubdivisionName, ALL_PROFILES ^ Profile.Minimum); // BT-79
                 writer.WriteEndElement(); // !PostalTradeAddress
             }
 
             if (!String.IsNullOrWhiteSpace(electronicAddress?.Address))
             {
-                writer.WriteStartElement("ram", "URIUniversalCommunication");
+                writer.WriteStartElement("ram", "URIUniversalCommunication", ALL_PROFILES ^ Profile.Minimum);
                 writer.WriteStartElement("ram", "URIID");
                 writer.WriteAttributeString("schemeID", electronicAddress.ElectronicAddressSchemeID.EnumToString());
                 writer.WriteValue(electronicAddress.Address);
@@ -1992,6 +2056,12 @@ namespace Envisia.InvoiceXml
                     // FC allowed only in Comfort, Extended and XRechnung profile for SellerTradeParty (and TODO: ItemSellerTradeParty)
                     if (taxRegistration.SchemeID == TaxRegistrationSchemeID.FC
                         && !(partyType == PartyTypes.SellerTradeParty && this._Descriptor.Profile.In(Profile.Extended, Profile.Comfort, Profile.XRechnung1, Profile.XRechnung)))
+                    {
+                        continue;
+                    }
+
+                    // MINIMUM does not contain the buyer VAT identifier (BT-48)
+                    if (isMinimumBuyer)
                     {
                         continue;
                     }

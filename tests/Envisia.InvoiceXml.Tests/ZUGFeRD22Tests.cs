@@ -1222,7 +1222,8 @@ namespace Envisia.InvoiceXml.Tests
 
             using (var memoryStream = new MemoryStream())
             {
-                originalInvoiceDescriptor.Save(memoryStream, ZUGFeRDVersion.Version23, Profile.Basic);
+                // BG-32 item attributes are part of EN 16931 and EXTENDED, not of BASIC
+                originalInvoiceDescriptor.Save(memoryStream, ZUGFeRDVersion.Version23, Profile.Comfort);
                 originalInvoiceDescriptor.Save(@"xrechnung with trade line settlement filled.xml", ZUGFeRDVersion.Version23);
 
                 // Load Invoice and compare to expected
@@ -3234,20 +3235,16 @@ namespace Envisia.InvoiceXml.Tests
             InvoiceDescriptor loadedInvoice = InvoiceDescriptor.Load(ms);
 
             // Assert
-            // PaymentTerms
+            // BASIC allows a single SpecifiedTradePaymentTerms: the descriptions are combined into BT-20,
+            // the first due date becomes BT-9.
+            Assert.AreEqual(1, Regex.Matches(text, "<ram:SpecifiedTradePaymentTerms>").Count);
             var paymentTerms = loadedInvoice.GetTradePaymentTerms();
             Assert.IsNotNull(paymentTerms);
-            Assert.HasCount(2, paymentTerms);
-            var paymentTerm = loadedInvoice.GetTradePaymentTerms().FirstOrDefault(i => i.Description.StartsWith("Zahlbar"));
-            Assert.IsNotNull(paymentTerm);
+            Assert.HasCount(1, paymentTerms);
+            var paymentTerm = paymentTerms.First();
             Assert.IsNull(paymentTerm.PaymentTermsType);
-            Assert.AreEqual("Zahlbar innerhalb 30 Tagen netto bis 04.04.2018", paymentTerm.Description);
+            Assert.AreEqual("Zahlbar innerhalb 30 Tagen netto bis 04.04.2018\n3% Skonto innerhalb 10 Tagen bis 15.03.2018", paymentTerm.Description);
             Assert.AreEqual(timestamp.AddDays(14), paymentTerm.DueDate);
-
-            paymentTerm = loadedInvoice.GetTradePaymentTerms().LastOrDefault();
-            Assert.IsNotNull(paymentTerm);
-            Assert.IsNull(paymentTerm.PaymentTermsType);
-            Assert.AreEqual("3% Skonto innerhalb 10 Tagen bis 15.03.2018", paymentTerm.Description);
             Assert.IsNull(paymentTerm.Percentage);
         } // !TestPaymentTermsMultiCardinalityWithBasic()
 

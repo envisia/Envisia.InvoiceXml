@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          8.0.x
+          10.0.x
+
+    - name: Restore
+      run: dotnet restore Envisia.InvoiceXml.sln
+
+    - name: Build
+      run: dotnet build Envisia.InvoiceXml.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test Envisia.InvoiceXml.sln --configuration Release --no-build --verbosity normal
+
+    - name: Pack
+      run: dotnet pack src/Envisia.InvoiceXml/Envisia.InvoiceXml.csproj --configuration Release --no-build --output artifacts
+
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages
+        path: artifacts/*

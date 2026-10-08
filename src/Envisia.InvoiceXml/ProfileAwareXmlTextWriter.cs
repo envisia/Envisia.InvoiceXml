@@ -193,6 +193,18 @@ namespace Envisia.InvoiceXml
             }
         } // !WriteStartElement()
 
+        /// <summary>
+        /// Writes all pending start elements, including the current one, even if no content follows.
+        /// Used for mandatory elements that may be empty in some profiles (e.g. ApplicableHeaderTradeDelivery in MINIMUM).
+        /// </summary>
+        public void WritePendingStartElements()
+        {
+            if (_IsNodeVisible())
+            {
+                _FlushPendingStartElements();
+            }
+        } // !WritePendingStartElements()
+
         public void WriteEndElement()
         {
             StackInfo infoForCurrentXmlLevel = this.XmlStack.Pop();

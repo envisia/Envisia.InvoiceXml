@@ -1289,10 +1289,12 @@ namespace Envisia.InvoiceXml.Tests
             // convert memory stream to string
             string xmlContent = Encoding.UTF8.GetString(ms.ToArray());
 
-            // load dom, find any empty elements (elements without child nodes and without value) and fail if any is found
+            // load dom, find any empty elements (elements without child nodes and without value) and fail if any is found.
+            // ApplicableHeaderTradeDelivery is mandatory in CII even if there is nothing to deliver.
             var doc = XDocument.Parse(xmlContent, LoadOptions.SetLineInfo);
             var emptyElements = doc.Descendants()
                 .Where(e => !e.Nodes().Any() && !e.Attributes().Any())
+                .Where(e => e.Name.LocalName != "ApplicableHeaderTradeDelivery")
                 .ToList();
             Assert.IsEmpty(emptyElements, $"Found empty elements in the XML: {string.Join("\r\n* ", emptyElements.Select(e => $"{e.Name.LocalName} (line {((IXmlLineInfo)e).LineNumber})"))}");
         } // !TestAvoidEmptyElementsWithMinimalInvoice()

@@ -105,6 +105,7 @@ namespace Envisia.InvoiceXml
 
                 // v2
                 { "urn:zugferd.de:2p0:minimum", Profile.Minimum },
+                { "urn:zugferd.de:2p0:basicwl", Profile.BasicWL },
                 { "urn:cen.eu:en16931:2017#compliant#urn:zugferd.de:2p0:basic", Profile.Basic },
                 { "urn:cen.eu:en16931:2017", Profile.Comfort },
                 { "urn:cen.eu:en16931:2017#conformant#urn:zugferd.de:2p0:extended", Profile.Extended },
@@ -121,6 +122,7 @@ namespace Envisia.InvoiceXml
                 { "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2", Profile.XRechnung },
                 { "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3", Profile.XRechnung },
                 { "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0", Profile.XRechnung },
+                { "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0#conformant#urn:xeinkauf.de:kosit:extension:xrechnung_3.0", Profile.XRechnung },
                 { "urn.cpro.gouv.fr:1p0:ereporting", Profile.EReporting }
             };
 
@@ -166,17 +168,8 @@ namespace Envisia.InvoiceXml
                         case Profile.Comfort: return "urn:cen.eu:en16931:2017";
                         case Profile.Extended: return "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended";
                         case Profile.XRechnung1: return "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";
-                        case Profile.XRechnung:
-                            {
-                                if (DateTime.Now >= new DateTime(2024, 02, 01))
-                                {
-                                    return "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
-                                }
-                                else
-                                {
-                                    return "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3";
-                                }
-                            }
+                        // XRechnung 3.0.x (currently 3.0.2) uses the same identifier for all patch versions
+                        case Profile.XRechnung: return "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0";
                         case Profile.EReporting: return "urn.cpro.gouv.fr:1p0:ereporting";
                         default: throw new Exception("Unsupported profile for ZUGFeRD version 21");
                     }
