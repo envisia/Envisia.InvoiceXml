@@ -40,7 +40,7 @@ namespace Envisia.InvoiceXml
     /// </para>
     /// <para>
     /// The codes are categorized as follows:
-    /// - 0002-0240: International and national business identifiers
+    /// - 0002-0248: International and national business identifiers
     /// - 9910-9959: VAT numbers and tax identification schemes
     /// - AN, AQ, AS, AU, EM: Electronic communication protocols
     /// </para>
@@ -373,6 +373,36 @@ namespace Envisia.InvoiceXml
         /// </summary>
         [EnumStringValue("0240")]
         RegisterOfLegalPersons,
+
+        /// <summary>
+        /// OpenPeppol Service Provider Identification Scheme (SPIS)
+        /// </summary>
+        [EnumStringValue("0242")]
+        OpenPeppolServiceProviderIdentificationScheme,
+
+        /// <summary>
+        /// Tax Identification (Tax ID), Nigeria
+        /// </summary>
+        [EnumStringValue("0244")]
+        NigeriaTaxIdentification,
+
+        /// <summary>
+        /// Tax identification number (DIČ), Slovakia
+        /// </summary>
+        [EnumStringValue("0245")]
+        SlovakiaTaxIdentificationNumber,
+
+        /// <summary>
+        /// German Electronic Business Address
+        /// </summary>
+        [EnumStringValue("0246")]
+        GermanElectronicBusinessAddress,
+
+        /// <summary>
+        /// Oman Value Added Tax Identification Number (VATIN)
+        /// </summary>
+        [EnumStringValue("0248")]
+        OmanVatIdentificationNumber,
 
         /// <summary>
         /// Hungary VAT number

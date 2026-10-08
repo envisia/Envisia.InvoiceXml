@@ -23,7 +23,7 @@ using System.ComponentModel;
 namespace Envisia.InvoiceXml
 {
     /// <summary>
-    /// Reason codes according to UNCL5189 code list
+    /// Reason codes according to UNCL7161 code list
     /// </summary>	    
     public enum ChargeReasonCodes
     {

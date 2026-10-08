@@ -156,7 +156,11 @@ namespace Envisia.InvoiceXml
 
             _Writer.WriteOptionalElementString("cbc", "BuyerReference", this._Descriptor.ReferenceOrderNo);
 
-            if (this._Descriptor.BillingPeriodStart.HasValue || this._Descriptor.BillingPeriodEnd.HasValue)
+            // BT-8: value added tax point date code. The model keeps it per tax (as in CII), UBL has it once on document level.
+            // Like the CII writer, a tax point date (BT-7) takes precedence over the code (BR-CO-3).
+            string taxPointDateCode = _encodeTaxPointDateCode(this._Descriptor.Taxes?.FirstOrDefault(t => !t.TaxPointDate.HasValue && t.DueDateTypeCode.HasValue)?.DueDateTypeCode);
+
+            if (this._Descriptor.BillingPeriodStart.HasValue || this._Descriptor.BillingPeriodEnd.HasValue || !String.IsNullOrWhiteSpace(taxPointDateCode))
             {
                 _Writer.WriteStartElement("cac", "InvoicePeriod");
 
@@ -168,6 +172,7 @@ namespace Envisia.InvoiceXml
                 {
                     _Writer.WriteElementString("cbc", "EndDate", _formatDate(this._Descriptor.BillingPeriodEnd.Value, false, true));
                 }
+                _Writer.WriteOptionalElementString("cbc", "DescriptionCode", taxPointDateCode); // BT-8
 
                 _Writer.WriteEndElement(); // !InvoicePeriod
             }
@@ -1261,6 +1266,7 @@ namespace Envisia.InvoiceXml
                 case InvoiceType.PartialConstructionInvoice: // 875
                 case InvoiceType.PartialFinalConstructionInvoice: // 876
                 case InvoiceType.FinalConstructionInvoice: // 877
+                case InvoiceType.CustomsInvoice: // 935
                     return true;
                 case InvoiceType.CreditNoteRelatedToGoodsOrServices: // 81
                 case InvoiceType.CreditNoteRelatedToFinancialAdjustments: // 83
@@ -1272,5 +1278,20 @@ namespace Envisia.InvoiceXml
                     throw new NotImplementedException($"Invoice type {type} not implemented in UBL writer.");
             }
         } // !_IsInvoiceAccordingToUBLSpecification()
+
+
+        /// <summary>
+        /// Maps the value added tax point date code (BT-8) from UNTDID 2475 (used in CII) to UNTDID 2005 (used in UBL).
+        /// </summary>
+        private static string _encodeTaxPointDateCode(DateTypeCodes? dateTypeCode)
+        {
+            switch (dateTypeCode)
+            {
+                case DateTypeCodes.InvoiceDate: return "3"; // Invoice document issue date time
+                case DateTypeCodes.DeliveryDate: return "35"; // Delivery date/time, actual
+                case DateTypeCodes.PaymentDate: return "432"; // Paid to date
+                default: return null;
+            }
+        } // !_encodeTaxPointDateCode()
     }
 }

@@ -24,7 +24,9 @@ using System.Text;
 namespace Envisia.InvoiceXml
 {
     /// <summary>
-    /// http://www.unece.org/trade/untdid/d00a/tred/tred5153.htm
+    /// Document type codes of additional referenced documents according to UNTDID 1001 (Document name code)
+    ///
+    /// https://service.unece.org/trade/untdid/d24a/tred/tred1001.htm
     /// </summary>
     public enum AdditionalReferencedDocumentTypeCode
     {

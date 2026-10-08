@@ -383,7 +383,7 @@ namespace Envisia.InvoiceXml
         HS,
 
         /// <summary>
-        ///  In bond number
+        /// ISBN (International Standard Book Number)
         /// </summary>
         IB,
 

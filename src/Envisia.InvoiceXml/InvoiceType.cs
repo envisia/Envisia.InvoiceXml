@@ -453,6 +453,13 @@ namespace Envisia.InvoiceXml
         /// EN16931 interpretation: Invoice
         /// </summary>
         [EnumStringValue("877")]
-        FinalConstructionInvoice
+        FinalConstructionInvoice,
+
+        /// <summary>
+        /// Customs invoice
+        /// EN16931 interpretation: Invoice
+        /// </summary>
+        [EnumStringValue("935")]
+        CustomsInvoice
     }
 }

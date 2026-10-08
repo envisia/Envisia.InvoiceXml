@@ -52,6 +52,10 @@ namespace Envisia.InvoiceXml
         /// <summary>
         /// Netherlands Antillean Guilder
         /// </summary>
+        /// <remarks>
+        /// Withdrawn: removed from the EN 16931 code list in version 17 and replaced by <see cref="XCG"/>.
+        /// The code is kept so that older invoices can still be read; it must not be used for new invoices.
+        /// </remarks>
         [EnumStringValue("ANG")]
         ANG,
 
@@ -106,6 +110,10 @@ namespace Envisia.InvoiceXml
         /// <summary>
         /// Bulgarian Lev
         /// </summary>
+        /// <remarks>
+        /// Withdrawn: removed from the EN 16931 code list in version 17, Bulgaria uses the euro (<see cref="EUR"/>) since 2026-01-01.
+        /// The code is kept so that older invoices can still be read; it must not be used for new invoices.
+        /// </remarks>
         [EnumStringValue("BGN")]
         BGN,
 
@@ -222,6 +230,12 @@ namespace Envisia.InvoiceXml
         /// </summary>
         [EnumStringValue("CLP")]
         CLP,
+
+        /// <summary>
+        /// Yuan Renminbi (offshore)
+        /// </summary>
+        [EnumStringValue("CNH")]
+        CNH,
 
         /// <summary>
         /// Yuan Renminbi
@@ -1014,6 +1028,15 @@ namespace Envisia.InvoiceXml
         /// </summary>
         [EnumStringValue("XCD")]
         XCD,
+
+        /// <summary>
+        /// Caribbean Guilder
+        /// </summary>
+        /// <remarks>
+        /// Replaces the Netherlands Antillean Guilder (<see cref="ANG"/>) in Curaçao and Sint Maarten.
+        /// </remarks>
+        [EnumStringValue("XCG")]
+        XCG,
 
         /// <summary>
         /// SDR (Special Drawing Right)

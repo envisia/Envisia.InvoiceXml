@@ -199,6 +199,12 @@ namespace Envisia.InvoiceXml
         VATEX_EU_132_1Q,
 
         /// <summary>
+        /// Exempt based on article 135, section 1 of Council Directive 2006/112/EC
+        /// </summary>
+        [EnumStringValue("VATEX-EU-135-1")]
+        VATEX_EU_135_1,
+
+        /// <summary>
         /// Exempt based on article 143 of Council Directive 2006/112/EC
         /// </summary>
         /// <remarks>

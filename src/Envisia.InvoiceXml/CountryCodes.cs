@@ -201,7 +201,7 @@ namespace Envisia.InvoiceXml
         BO,
 
         /// <summary>
-        /// Caribbean Netherlands
+        /// Bonaire, Sint Eustatius and Saba
         /// </summary>
         [EnumStringValue("BQ")]
         BQ,
@@ -1371,7 +1371,7 @@ namespace Envisia.InvoiceXml
         TO,
 
         /// <summary>
-        /// Turkey
+        /// Türkiye
         /// </summary>
         [EnumStringValue("TR")]
         TR,

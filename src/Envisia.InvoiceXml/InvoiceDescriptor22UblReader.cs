@@ -316,17 +316,21 @@ namespace Envisia.InvoiceXml
                 retval._AddDebitorFinancialAccount(_nodeAsBankAccount(node, ".", nsmgr));
             }
 
+            // BT-8 is given once on document level in UBL, the model keeps it per tax (as in CII)
+            DateTypeCodes? taxPointDateCode = _decodeTaxPointDateCode(XmlUtils.NodeAsString(doc.DocumentElement, "/*[1]/cac:InvoicePeriod/cbc:DescriptionCode", nsmgr));
+
             foreach (XmlNode node in doc.SelectNodes("/*/cac:TaxTotal/cac:TaxSubtotal", nsmgr))
             {
-                retval.AddApplicableTradeTax(XmlUtils.NodeAsDecimal(node, "cbc:TaxableAmount", nsmgr, 0).Value,
-                                             XmlUtils.NodeAsDecimal(node, "cac:TaxCategory/cbc:Percent", nsmgr, 0).Value,
-                                             XmlUtils.NodeAsDecimal(node, "cbc:TaxAmount", nsmgr, 0).Value,
-                                             EnumExtensions.StringToEnum<TaxTypes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cac:TaxScheme/cbc:ID", nsmgr)),
-                                             EnumExtensions.StringToEnum<TaxCategoryCodes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:ID", nsmgr)),
-                                             null,
-                                             EnumExtensions.StringToNullableEnum<TaxExemptionReasonCodes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:TaxExemptionReasonCode", nsmgr)),
-                                             XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:TaxExemptionReason", nsmgr)
-                                             );
+                Tax tax = retval.AddApplicableTradeTax(XmlUtils.NodeAsDecimal(node, "cbc:TaxableAmount", nsmgr, 0).Value,
+                                                       XmlUtils.NodeAsDecimal(node, "cac:TaxCategory/cbc:Percent", nsmgr, 0).Value,
+                                                       XmlUtils.NodeAsDecimal(node, "cbc:TaxAmount", nsmgr, 0).Value,
+                                                       EnumExtensions.StringToEnum<TaxTypes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cac:TaxScheme/cbc:ID", nsmgr)),
+                                                       EnumExtensions.StringToEnum<TaxCategoryCodes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:ID", nsmgr)),
+                                                       null,
+                                                       EnumExtensions.StringToNullableEnum<TaxExemptionReasonCodes>(XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:TaxExemptionReasonCode", nsmgr)),
+                                                       XmlUtils.NodeAsString(node, "cac:TaxCategory/cbc:TaxExemptionReason", nsmgr)
+                                                       );
+                tax.DueDateTypeCode = taxPointDateCode;
             }
 
             // As both document level and document item level element have same name
@@ -972,5 +976,20 @@ namespace Envisia.InvoiceXml
                 ReferenceTypeCode = EnumExtensions.StringToNullableEnum<ReferenceTypeCodes>(XmlUtils.NodeAsString(node, "ram:ReferenceTypeCode", nsmgr))
             };
         }
+
+
+        /// <summary>
+        /// Maps the value added tax point date code (BT-8) from UNTDID 2005 (used in UBL) to UNTDID 2475 (used in CII and the model).
+        /// </summary>
+        private static DateTypeCodes? _decodeTaxPointDateCode(string code)
+        {
+            switch (code?.Trim())
+            {
+                case "3": return DateTypeCodes.InvoiceDate; // Invoice document issue date time
+                case "35": return DateTypeCodes.DeliveryDate; // Delivery date/time, actual
+                case "432": return DateTypeCodes.PaymentDate; // Paid to date
+                default: return null;
+            }
+        } // !_decodeTaxPointDateCode()
     }
 }

@@ -174,6 +174,15 @@ namespace Envisia.InvoiceXml
         H87,
 
         /// <summary>
+        /// square decametre
+        /// Synonym: are (Ar), abbreviation: a
+        /// </summary>
+        /// <remarks>
+        /// 100 m^2
+        /// </remarks>
+        H16,
+
+        /// <summary>
         /// square hectometre
         /// Abbreviation: ha
         /// </summary>
@@ -569,11 +578,11 @@ namespace Envisia.InvoiceXml
         XPK,
 
         /// <summary>
-        /// Ar
-        /// Abkürzung: a
+        /// hundred cubic metre
         /// </summary>
         /// <remarks>
-        /// 100 m^2
+        /// 100 m^3
+        /// Note: this is not the code for 'Ar' (are, 100 m^2), use <see cref="H16"/> (square decametre) for that.
         /// </remarks>
         FF,
 

@@ -586,8 +586,11 @@ namespace Envisia.InvoiceXml
         HewlettPackardNetwork,
 
         /// <summary>
-        /// DANISH CHAMBER OF COMMERCE Scheme (EDIRA compliant)
+        /// The Danish Business Authority - P-number (DK:P)
         /// </summary>
+        /// <remarks>
+        /// The member name refers to the former name of this scheme (DANISH CHAMBER OF COMMERCE Scheme (EDIRA compliant)).
+        /// </remarks>
         [EnumStringValue("0096")]
         DanishChamberScheme,
 
@@ -1390,8 +1393,11 @@ namespace Envisia.InvoiceXml
         NobbProductNumber,
 
         /// <summary>
-        /// Description not known
+        /// Elnummer
         /// </summary>
+        /// <remarks>
+        /// The member name dates from the time the code list did not publish a name for this scheme.
+        /// </remarks>
         [EnumStringValue("0233")]
         DescriptionNotKnown,
 
@@ -1408,8 +1414,11 @@ namespace Envisia.InvoiceXml
         UaeTaxIdentificationNumber,
 
         /// <summary>
-        /// Description not known
+        /// ToimipaikkaID
         /// </summary>
+        /// <remarks>
+        /// The member name dates from the time the code list did not publish a name for this scheme.
+        /// </remarks>
         [EnumStringValue("0236")]
         DescriptionNotKnown2,
 
@@ -1435,7 +1444,64 @@ namespace Envisia.InvoiceXml
         /// Register of legal persons (in French : Répertoire des personnes morales)
         /// </summary>
         [EnumStringValue("0240")]
-        RegisterOfLegalPersons
+        RegisterOfLegalPersons,
+
+        /// <summary>
+        /// Hitachi Rail
+        /// </summary>
+        /// <remarks>
+        /// The EN 16931 code list (v16) lists this code as "Name unknown"; the name is taken from the Peppol code list.
+        /// </remarks>
+        [EnumStringValue("0241")]
+        HitachiRail,
+
+        /// <summary>
+        /// OpenPeppol Service Provider Identification Scheme (SPIS)
+        /// </summary>
+        [EnumStringValue("0242")]
+        OpenPeppolServiceProviderIdentificationScheme,
+
+        /// <summary>
+        /// Business Partner Number (Catena-X)
+        /// </summary>
+        /// <remarks>
+        /// The EN 16931 code list (v16) lists this code as "Name unknown"; the name is taken from the Peppol code list.
+        /// </remarks>
+        [EnumStringValue("0243")]
+        CatenaXBusinessPartnerNumber,
+
+        /// <summary>
+        /// Tax Identification (Tax ID), Nigeria
+        /// </summary>
+        [EnumStringValue("0244")]
+        NigeriaTaxIdentification,
+
+        /// <summary>
+        /// Tax identification number (DIČ), Slovakia
+        /// </summary>
+        [EnumStringValue("0245")]
+        SlovakiaTaxIdentificationNumber,
+
+        /// <summary>
+        /// German Electronic Business Address
+        /// </summary>
+        [EnumStringValue("0246")]
+        GermanElectronicBusinessAddress,
+
+        /// <summary>
+        /// Name unknown
+        /// </summary>
+        /// <remarks>
+        /// No name has been published for this scheme yet.
+        /// </remarks>
+        [EnumStringValue("0247")]
+        DescriptionNotKnown3,
+
+        /// <summary>
+        /// Oman Value Added Tax Identification Number (VATIN)
+        /// </summary>
+        [EnumStringValue("0248")]
+        OmanVatIdentificationNumber
     }
 
 }
