@@ -312,6 +312,12 @@ namespace Envisia.InvoiceXml.Tests
                     Assert.IsEmpty(errors, $"Factur-X {schemaVersion}: " + string.Join(Environment.NewLine, errors));
                 }
             }
+            else
+            {
+                bool isCreditNote = System.Text.Encoding.UTF8.GetString(ms.ToArray()).Contains("<ubl:CreditNote");
+                List<string> errors = SchemaValidator.Validate(ms, SchemaValidator.GetUblSchemaPath(isCreditNote));
+                Assert.IsEmpty(errors, "UBL 2.1: " + string.Join(Environment.NewLine, errors));
+            }
 
             ms.Seek(0, SeekOrigin.Begin);
             xml = new XmlDocument();
