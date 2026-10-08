@@ -454,6 +454,14 @@ namespace Envisia.InvoiceXml
         public List<AdvancePayment> AdvancePayments { get; internal set; } = new List<AdvancePayment>();
 
         /// <summary>
+        /// Financial adjustments on document level (SpecifiedFinancialAdjustment), Extended profile only.
+        ///
+        /// Introduced with Factur-X 1.09 / ZUGFeRD 2.5. The amounts are added to the amount due for payment (BT-115),
+        /// see BR-FXEXT-CO-16. Please use AddFinancialAdjustment() to add an adjustment.
+        /// </summary>
+        public List<FinancialAdjustment> FinancialAdjustments { get; internal set; } = new List<FinancialAdjustment>();
+
+        /// <summary>
         /// A group of business terms providing information about a preceding invoices.
         ///
         /// To be used in case:
@@ -518,6 +526,12 @@ namespace Envisia.InvoiceXml
         /// Code for trade delivery terms / Detailangaben zu den Lieferbedingungen, BT-X-22
         /// </summary>
         public TradeDeliveryTermCodes? ApplicableTradeDeliveryTermsCode { get; set; }
+
+        /// <summary>
+        /// Location that is relevant for the delivery terms, BG-X-88 (Extended profile only).
+        /// It is only written together with the delivery terms code (ApplicableTradeDeliveryTermsCode, BT-X-145)
+        /// </summary>
+        public TradeLocation ApplicableTradeDeliveryTermsLocation { get; set; }
 
         /// <summary>
         /// Details about the associated order confirmation (BT-14).
@@ -1427,6 +1441,75 @@ namespace Envisia.InvoiceXml
 
 
         /// <summary>
+        /// Adds a financial adjustment on document level (SpecifiedFinancialAdjustment).
+        ///
+        /// Only written in profile Extended (Factur-X 1.09 / ZUGFeRD 2.5). Please note that the amount has to be
+        /// included in the amount due for payment (BT-115), see BR-FXEXT-CO-16. The other profiles omit the adjustments,
+        /// there BT-115 has to equal BT-112 - BT-113 + BT-114 (BR-CO-16).
+        /// </summary>
+        /// <param name="actualAmount">Amount of the adjustment</param>
+        /// <param name="reason">Reason of the adjustment</param>
+        /// <returns>The added financial adjustment</returns>
+        public FinancialAdjustment AddFinancialAdjustment(decimal actualAmount, string reason)
+        {
+            FinancialAdjustment financialAdjustment = new FinancialAdjustment()
+            {
+                ActualAmount = actualAmount,
+                Reason = reason
+            };
+            this.FinancialAdjustments.Add(financialAdjustment);
+            return financialAdjustment;
+        } // !AddFinancialAdjustment()
+
+
+        /// <summary>
+        /// Returns all financial adjustments on document level
+        /// </summary>
+        /// <returns>List of financial adjustments</returns>
+        public List<FinancialAdjustment> GetFinancialAdjustments()
+        {
+            return this.FinancialAdjustments;
+        } // !GetFinancialAdjustments()
+
+
+        /// <summary>
+        /// Checks if any financial adjustments exist
+        /// </summary>
+        /// <returns>True if financial adjustments exist, false otherwise</returns>
+        public bool AnyFinancialAdjustments()
+        {
+            return this.FinancialAdjustments?.Any() == true;
+        } // !AnyFinancialAdjustments()
+
+
+        /// <summary>
+        /// Sets the delivery terms, optionally including the location that is relevant for the delivery terms.
+        /// Only written in profile Extended.
+        ///
+        /// BG-X-22
+        /// </summary>
+        /// <param name="deliveryTypeCode">Delivery terms (code), BT-X-145</param>
+        /// <param name="locationCountry">Country code of the relevant location, BT-X-563</param>
+        /// <param name="locationName">Name of the relevant location, BT-X-564</param>
+        public void SetApplicableTradeDeliveryTerms(TradeDeliveryTermCodes deliveryTypeCode, CountryCodes? locationCountry = null, string locationName = null)
+        {
+            this.ApplicableTradeDeliveryTermsCode = deliveryTypeCode;
+            if (locationCountry.HasValue || !String.IsNullOrWhiteSpace(locationName))
+            {
+                this.ApplicableTradeDeliveryTermsLocation = new TradeLocation()
+                {
+                    Country = locationCountry,
+                    Name = locationName
+                };
+            }
+            else
+            {
+                this.ApplicableTradeDeliveryTermsLocation = null;
+            }
+        } // !SetApplicableTradeDeliveryTerms()
+
+
+        /// <summary>
         /// Sets the total amounts for the invoice
         /// </summary>
         /// <param name="lineTotalAmount">Sum of all line items</param>
@@ -2057,7 +2140,9 @@ namespace Envisia.InvoiceXml
         /// <param name="id">Optional: old German bank account no</param>
         /// <param name="bankleitzahl">Optional: old German Bankleitzahl</param>
         /// <param name="bankName">Optional: old German bank name</param>
-        public void AddDebitorFinancialAccount(string iban, string bic, string id = null, string bankleitzahl = null, string bankName = null)
+        /// <param name="name">Optional: debtor account name, written in profile Extended only (Factur-X 1.09 / ZUGFeRD 2.5)</param>
+        /// <remarks>The BIC of the debtor (PayerSpecifiedDebtorFinancialInstitution) is written in profile Extended only (Factur-X 1.09 / ZUGFeRD 2.5)</remarks>
+        public void AddDebitorFinancialAccount(string iban, string bic, string id = null, string bankleitzahl = null, string bankName = null, string name = null)
         {
             this.DebitorBankAccounts.Add(new BankAccount()
             {
@@ -2065,7 +2150,8 @@ namespace Envisia.InvoiceXml
                 IBAN = iban,
                 BIC = bic,
                 Bankleitzahl = bankleitzahl,
-                BankName = bankName
+                BankName = bankName,
+                Name = name
             });
         } // !AddDebitorFinancialAccount()
 

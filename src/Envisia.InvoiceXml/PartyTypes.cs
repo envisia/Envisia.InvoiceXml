@@ -39,7 +39,9 @@ namespace Envisia.InvoiceXml
         BuyerAgentTradeParty,
         InvoicerTradeParty,
         PayerTradeParty,
-        SellerTaxRepresentativeTradeParty
+        SellerTaxRepresentativeTradeParty,
+        ItemSellerTradeParty,
+        ManufacturerTradeParty
     }
 
     internal static class PartyTypeExtensions

@@ -188,6 +188,9 @@ namespace Envisia.InvoiceXml
                 }
             }
 
+            // BG-X-88: BT-X-563, BT-X-564
+            retval.ApplicableTradeDeliveryTermsLocation = _nodeAsTradeLocation(doc.DocumentElement, "//ram:ApplicableHeaderTradeAgreement/ram:ApplicableTradeDeliveryTerms/ram:RelevantTradeLocation", nsmgr);
+
             //Get all referenced and embedded documents, BG-24
             XmlNodeList referencedDocNodes = doc.SelectNodes(".//ram:ApplicableHeaderTradeAgreement/ram:AdditionalReferencedDocument", nsmgr);
             foreach (XmlNode referenceNode in referencedDocNodes)
@@ -358,6 +361,9 @@ namespace Envisia.InvoiceXml
                     IBAN = XmlUtils.NodeAsString(payerPartyDebtorFinancialAccountNode, ".//ram:IBANID", nsmgr),
                     Bankleitzahl = XmlUtils.NodeAsString(payerPartyDebtorFinancialAccountNode, ".//ram:GermanBankleitzahlID", nsmgr),
                     BankName = XmlUtils.NodeAsString(payerPartyDebtorFinancialAccountNode, ".//ram:Name", nsmgr),
+                    // debtor account name and BIC: EXTENDED, Factur-X 1.09 / ZUGFeRD 2.5
+                    Name = XmlUtils.NodeAsString(payerPartyDebtorFinancialAccountNode, "./ram:AccountName", nsmgr),
+                    BIC = XmlUtils.NodeAsString(specifiedTradeSettlementPaymentMeansNode, "./ram:PayerSpecifiedDebtorFinancialInstitution/ram:BICID", nsmgr)
                 };
 
                 retval._AddDebitorFinancialAccount(account);
@@ -486,6 +492,13 @@ namespace Envisia.InvoiceXml
             retval.TotalPrepaidAmount = XmlUtils.NodeAsDecimal(doc.DocumentElement, "//ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:TotalPrepaidAmount", nsmgr);
             retval.DuePayableAmount = XmlUtils.NodeAsDecimal(doc.DocumentElement, "//ram:SpecifiedTradeSettlementHeaderMonetarySummation/ram:DuePayableAmount", nsmgr);
 
+            // SpecifiedFinancialAdjustment, EXTENDED, Factur-X 1.09 / ZUGFeRD 2.5
+            foreach (XmlNode node in doc.SelectNodes("//ram:ApplicableHeaderTradeSettlement/ram:SpecifiedFinancialAdjustment", nsmgr))
+            {
+                retval.AddFinancialAdjustment(XmlUtils.NodeAsDecimal(node, "./ram:ActualAmount", nsmgr, 0).Value,
+                                              XmlUtils.NodeAsString(node, "./ram:Reason", nsmgr));
+            }
+
             foreach (XmlNode node in doc.SelectNodes("//ram:ApplicableHeaderTradeSettlement/ram:ReceivableSpecifiedTradeAccountingAccount", nsmgr))
             {
                 retval.AddReceivableSpecifiedTradeAccountingAccount(
@@ -586,7 +599,7 @@ namespace Envisia.InvoiceXml
 
             foreach (XmlNode node in doc.SelectNodes("//ram:IncludedSupplyChainTradeLineItem", nsmgr))
             {
-                retval._AddTradeLineItem(_parseTradeLineItem(node, nsmgr));
+                retval._AddTradeLineItem(_parseTradeLineItem(node, nsmgr, retval));
             }
 
             return retval;
@@ -616,7 +629,13 @@ namespace Envisia.InvoiceXml
         } // !IsReadableByThisReaderVersion()
 
 
-        private static TradeLineItem _parseTradeLineItem(XmlNode tradeLineItem, XmlNamespaceManager nsmgr = null)
+        /// <summary>
+        /// Parses a single invoice line (BG-25)
+        /// </summary>
+        /// <param name="tradeLineItem">The IncludedSupplyChainTradeLineItem node</param>
+        /// <param name="nsmgr">Namespace manager</param>
+        /// <param name="descriptor">The invoice that is being read, used for the invoice currency (BT-5) and the VAT accounting currency (BT-6)</param>
+        private static TradeLineItem _parseTradeLineItem(XmlNode tradeLineItem, XmlNamespaceManager nsmgr, InvoiceDescriptor descriptor)
         {
             if (tradeLineItem == null)
             {
@@ -646,6 +665,9 @@ namespace Envisia.InvoiceXml
                 UltimateShipTo = _nodeAsParty(tradeLineItem, ".//ram:SpecifiedLineTradeDelivery/ram:UltimateShipToTradeParty", nsmgr),
                 ChargeFreeQuantity = XmlUtils.NodeAsDecimal(tradeLineItem, ".//ram:ChargeFreeQuantity", nsmgr),
                 PackageQuantity = XmlUtils.NodeAsDecimal(tradeLineItem, ".//ram:PackageQuantity", nsmgr),
+                PerPackageUnitQuantity = XmlUtils.NodeAsDecimal(tradeLineItem, ".//ram:SpecifiedLineTradeDelivery/ram:PerPackageUnitQuantity", nsmgr), // BT-X-561
+                ItemSeller = _nodeAsParty(tradeLineItem, ".//ram:SpecifiedLineTradeAgreement/ram:ItemSellerTradeParty", nsmgr), // BG-X-90
+                Manufacturer = _nodeAsParty(tradeLineItem, ".//ram:SpecifiedTradeProduct/ram:ManufacturerTradeParty", nsmgr),
                 LineTotalAmount = XmlUtils.NodeAsDecimal(tradeLineItem, ".//ram:LineTotalAmount", nsmgr),
                 TaxCategoryCode = EnumExtensions.StringToNullableEnum<TaxCategoryCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:ApplicableTradeTax/ram:CategoryCode", nsmgr)),
                 TaxType = EnumExtensions.StringToNullableEnum<TaxTypes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:ApplicableTradeTax/ram:TypeCode", nsmgr)),
@@ -659,6 +681,7 @@ namespace Envisia.InvoiceXml
                 UnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:BilledQuantity/@unitCode", nsmgr)),
                 ChargeFreeUnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:ChargeFreeQuantity/@unitCode", nsmgr)),
                 PackageUnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:PackageQuantity/@unitCode", nsmgr)),
+                PerPackageUnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:SpecifiedLineTradeDelivery/ram:PerPackageUnitQuantity/@unitCode", nsmgr)),
                 BillingPeriodStart = XmlUtils.NodeAsDateTime(tradeLineItem, ".//ram:BillingSpecifiedPeriod/ram:StartDateTime/udt:DateTimeString", nsmgr),
                 BillingPeriodEnd = XmlUtils.NodeAsDateTime(tradeLineItem, ".//ram:BillingSpecifiedPeriod/ram:EndDateTime/udt:DateTimeString", nsmgr),
             };
@@ -677,7 +700,10 @@ namespace Envisia.InvoiceXml
                 {
                     item.ApplicableProductCharacteristics.Add(new ApplicableProductCharacteristic()
                     {
+                        TypeCode = XmlUtils.NodeAsString(applicableProductCharacteristic, "./ram:TypeCode", nsmgr, null), // BT-X-11
                         Description = XmlUtils.NodeAsString(applicableProductCharacteristic, ".//ram:Description", nsmgr),
+                        ValueMeasure = XmlUtils.NodeAsDecimal(applicableProductCharacteristic, "./ram:ValueMeasure", nsmgr), // BT-X-12
+                        ValueMeasureUnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(XmlUtils.NodeAsString(applicableProductCharacteristic, "./ram:ValueMeasure/@unitCode", nsmgr)), // BT-X-12-0
                         Value = XmlUtils.NodeAsString(applicableProductCharacteristic, ".//ram:Value", nsmgr),
                     });
                 }
@@ -699,6 +725,19 @@ namespace Envisia.InvoiceXml
                     UnitQuantity = XmlUtils.NodeAsDecimal(includedItem, ".//ram:UnitQuantity", nsmgr, null),
                     UnitCode = EnumExtensions.StringToNullableEnum<QuantityCodes>(unitCode)
                 });
+            }
+
+            // BG-X-87: BT-X-562, BG-X-89
+            item.ApplicableTradeDeliveryTermsCode = EnumExtensions.StringToNullableEnum<TradeDeliveryTermCodes>(XmlUtils.NodeAsString(tradeLineItem, ".//ram:SpecifiedLineTradeAgreement/ram:ApplicableTradeDeliveryTerms/ram:DeliveryTypeCode", nsmgr));
+            item.ApplicableTradeDeliveryTermsLocation = _nodeAsTradeLocation(tradeLineItem, ".//ram:SpecifiedLineTradeAgreement/ram:ApplicableTradeDeliveryTerms/ram:RelevantTradeLocation", nsmgr);
+
+            // BT-X-587, BT-X-588
+            foreach (XmlNode node in tradeLineItem.SelectNodes(".//ram:SpecifiedLineTradeAgreement/ram:ItemSellerTradeParty/ram:SpecifiedTaxRegistration", nsmgr))
+            {
+                string id = XmlUtils.NodeAsString(node, "./ram:ID", nsmgr);
+                string schemeID = XmlUtils.NodeAsString(node, "./ram:ID/@schemeID", nsmgr);
+
+                item.AddItemSellerTaxRegistration(id, EnumExtensions.StringToEnum<TaxRegistrationSchemeID>(schemeID));
             }
 
             if (tradeLineItem.SelectSingleNode(".//ram:SpecifiedLineTradeAgreement/ram:BuyerOrderReferencedDocument", nsmgr) != null)
@@ -773,7 +812,23 @@ namespace Envisia.InvoiceXml
                 if (specifiedTradeSettlementLineMonetarySummationNode != null)
                 {
                     // Der Reader erhält vorhandene Daten unabhängig von der späteren Profilvalidierung.
-                    item.TotalAllowanceChargeAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, "./ram:TotalAllowanceChargeAmount", nsmgr);
+                    item.ChargeTotalAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, "./ram:ChargeTotalAmount", nsmgr); // BT-X-327
+                    item.AllowanceTotalAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, "./ram:AllowanceTotalAmount", nsmgr); // BT-X-328
+
+                    // BT-X-329 in invoice currency (BT-5), preferred by currencyID; BT-X-590 in accounting currency (BT-6), if it differs from BT-5
+                    string accountingCurrency = (descriptor.TaxCurrency.HasValue && (descriptor.TaxCurrency.Value != descriptor.Currency)) ? descriptor.TaxCurrency.Value.EnumToString() : null;
+                    item.TaxTotalAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, $"./ram:TaxTotalAmount[@currencyID='{descriptor.Currency.EnumToString()}']", nsmgr);
+                    if (!item.TaxTotalAmount.HasValue)
+                    {
+                        item.TaxTotalAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, accountingCurrency == null ? "./ram:TaxTotalAmount" : $"./ram:TaxTotalAmount[not(@currencyID='{accountingCurrency}')]", nsmgr);
+                    }
+                    if (accountingCurrency != null)
+                    {
+                        item.TaxTotalAmountInAccountingCurrency = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, $"./ram:TaxTotalAmount[@currencyID='{accountingCurrency}']", nsmgr);
+                    }
+
+                    item.GrandTotalAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, "./ram:GrandTotalAmount", nsmgr); // BT-X-330
+                    item.TotalAllowanceChargeAmount = XmlUtils.NodeAsDecimal(specifiedTradeSettlementLineMonetarySummationNode, "./ram:TotalAllowanceChargeAmount", nsmgr); // BT-X-98
                 }
 
                 foreach (XmlNode invoiceReferencedDocumentNode in tradeLineItem.SelectNodes(".//ram:SpecifiedLineTradeSettlement/ram:InvoiceReferencedDocument", nsmgr))
@@ -787,6 +842,7 @@ namespace Envisia.InvoiceXml
                 item.AdditionalReferencedDocuments.Add(_readAdditionalReferencedDocument(additionalReferencedDocumentNode, nsmgr));
             }
 
+            // BT-133-00: EN 16931 allows one accounting reference per line, EXTENDED allows several
             foreach (XmlNode receivableSpecifiedTradeAccountingAccountNode in tradeLineItem.SelectNodes(".//ram:SpecifiedLineTradeSettlement/ram:ReceivableSpecifiedTradeAccountingAccount", nsmgr))
             {
                 item.ReceivableSpecifiedTradeAccountingAccounts.Add(new ReceivableSpecifiedTradeAccountingAccount()
@@ -794,7 +850,6 @@ namespace Envisia.InvoiceXml
                     TradeAccountID = XmlUtils.NodeAsString(receivableSpecifiedTradeAccountingAccountNode, "./ram:ID", nsmgr),
                     TradeAccountTypeCode = EnumExtensions.StringToNullableEnum<AccountingAccountTypeCodes>(XmlUtils.NodeAsString(receivableSpecifiedTradeAccountingAccountNode, ".//ram:TypeCode", nsmgr))
                 });
-                break;
             }
 
             if (tradeLineItem.SelectSingleNode(".//ram:AssociatedDocumentLineDocument", nsmgr) != null)
@@ -977,6 +1032,30 @@ namespace Envisia.InvoiceXml
 
             return retval;
         } // !_nodeAsParty()
+
+
+        /// <summary>
+        /// Reads the location that is relevant for the delivery terms (RelevantTradeLocation), document level BG-X-88, line level BG-X-89.
+        /// </summary>
+        private static TradeLocation _nodeAsTradeLocation(XmlNode baseNode, string xpath, XmlNamespaceManager nsmgr = null)
+        {
+            if (baseNode == null)
+            {
+                return null;
+            }
+
+            XmlNode node = baseNode.SelectSingleNode(xpath, nsmgr);
+            if (node == null)
+            {
+                return null;
+            }
+
+            return new TradeLocation()
+            {
+                Country = EnumExtensions.StringToNullableEnum<CountryCodes>(XmlUtils.NodeAsString(node, "./ram:CountryID", nsmgr)),
+                Name = XmlUtils.NodeAsString(node, "./ram:Name", nsmgr, null)
+            };
+        } // !_nodeAsTradeLocation()
 
 
         private static AdditionalReferencedDocument _readAdditionalReferencedDocument(XmlNode node, XmlNamespaceManager nsmgr)

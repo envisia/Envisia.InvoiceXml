@@ -186,8 +186,13 @@ namespace Envisia.InvoiceXml
             decimal prepaid = descriptor.TotalPrepaidAmount.GetValueOrDefault();
             decimal rounding = descriptor.RoundingAmount.GetValueOrDefault();
 
+            // Financial adjustments (SpecifiedFinancialAdjustment) only exist in the EXTENDED profile of Factur-X 1.09 / ZUGFeRD 2.5,
+            // the writer omits them in all other profiles.
+            decimal financialAdjustments = descriptor.GetFinancialAdjustments()?.Where(adjustment => adjustment != null).Sum(adjustment => adjustment.ActualAmount) ?? 0m;
+
             // BR-CO-16: BT-115 equals BT-112 minus BT-113 plus BT-114.
-            decimal duePayable = grandTotal - prepaid + rounding;
+            // BR-FXEXT-CO-16 (EXTENDED): additionally plus the sum of the financial adjustment amounts.
+            decimal duePayable = grandTotal - prepaid + rounding + financialAdjustments;
 
             retval.Messages.Add(String.Format("Recalculated tax total = {0:0.00}", taxTotal));
             retval.Messages.Add(String.Format("Recalculated grand total = {0:0.0000} EUR(tax basis total + tax total)", grandTotal));
@@ -262,7 +267,8 @@ namespace Envisia.InvoiceXml
             }
             else if (descriptor.GrandTotalAmount.HasValue)
             {
-                decimal expectedDuePayable = descriptor.GrandTotalAmount.Value - prepaid + rounding;
+                // BR-CO-16 / BR-FXEXT-CO-16
+                decimal expectedDuePayable = descriptor.GrandTotalAmount.Value - prepaid + rounding + financialAdjustments;
                 if (Math.Abs(expectedDuePayable - descriptor.DuePayableAmount.Value) < 0.01m)
                 {
                     retval.Messages.Add(String.Format("trade.settlement.monetarySummation.duePayable Message: Berechneter Wert ist wie vorhanden:[{0:0.0000}]", expectedDuePayable));

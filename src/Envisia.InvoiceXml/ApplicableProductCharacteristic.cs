@@ -24,9 +24,28 @@ namespace Envisia.InvoiceXml
     public class ApplicableProductCharacteristic
     {
         /// <summary>
+        /// Art der Produkteigenschaft (Code), UNTDID 6313 + Factur-X-Erweiterung
+        ///
+        /// Nur im Profil Extended. BT-X-11
+        /// </summary>
+        public string TypeCode { get; set; }
+        /// <summary>
         /// Beschriebene Produkteigenschaft
         /// </summary>
         public string Description { get; set; }
+        /// <summary>
+        /// Wert der Produkteigenschaft als numerische Messgröße
+        ///
+        /// Nur im Profil Extended. Factur-X 1.09 erlaubt je Eigenschaft entweder Value (BT-161) oder ValueMeasure, nicht beides (BR-FXEXT-BR-54-2).
+        /// BT-X-12
+        /// </summary>
+        public decimal? ValueMeasure { get; set; }
+        /// <summary>
+        /// Maßeinheit der numerischen Messgröße
+        ///
+        /// BT-X-12-0
+        /// </summary>
+        public QuantityCodes? ValueMeasureUnitCode { get; set; }
         /// <summary>
         /// Wert der Eigenschaft
         /// </summary>

@@ -71,6 +71,16 @@ namespace Envisia.InvoiceXml
 
             this._Descriptor = descriptor;
             _validateAdvancePayments();
+            _validateFinancialAdjustments();
+
+            // BT-6
+            // BR-53 verlangt BT-111 zu BT-6; R005 verlangt eine von BT-5 abweichende Währung.
+            // Die gemeinsame Bedingung verhindert BT-6 ohne tatsächlich ausgegebenen Betrag.
+            // Die Steuerbeträge der Positionen in Buchungswährung (BT-X-590) setzen BT-6 ebenfalls voraus.
+            bool writeAccountingCurrency = this._Descriptor.TaxCurrency.HasValue &&
+                this._Descriptor.TaxCurrency.Value != this._Descriptor.Currency &&
+                this._Descriptor.TaxTotalAmountInAccountingCurrency.HasValue;
+
             this._Writer = new ProfileAwareXmlTextWriter(stream, descriptor.Profile, options?.AutomaticallyCleanInvalidCharacters ?? false);
             this._Writer.SetNamespaces(_Namespaces);
 
@@ -217,10 +227,29 @@ namespace Envisia.InvoiceXml
                 {
                     foreach (var productCharacteristic in tradeLineItem.ApplicableProductCharacteristics)
                     {
+                        // EN 16931 requires the item attribute name (BT-160) and value (BT-161). An attribute that is
+                        // described by the EXTENDED code (BT-X-11) or measure (BT-X-12) only cannot be written in the other profiles.
+                        if ((descriptor.Profile != Profile.Extended) &&
+                            (String.IsNullOrWhiteSpace(productCharacteristic.Description) || String.IsNullOrWhiteSpace(productCharacteristic.Value)))
+                        {
+                            continue;
+                        }
+
                         _Writer.WriteStartElement("ram", "ApplicableProductCharacteristic", PROFILE_COMFORT_EXTENDED_XRECHNUNG);
-                        // TODO: TypeCode        // BT-X-11, Art der Produkteigenschaft (Code), Extended
-                        _Writer.WriteOptionalElementString("ram", "Description", productCharacteristic.Description);
-                        // TODO: ValueMeasure    // BT-X-12, Wert der Produkteigenschaft (numerische Messgröße), mit unitCode, Extended
+                        _Writer.WriteOptionalElementString("ram", "TypeCode", productCharacteristic.TypeCode, Profile.Extended); // BT-X-11, Art der Produkteigenschaft (Code)
+                        _Writer.WriteOptionalElementString("ram", "Description", productCharacteristic.Description); // BT-160
+                        if (productCharacteristic.ValueMeasure.HasValue)
+                        {
+                            // BT-X-12, Wert der Produkteigenschaft (numerische Messgröße) mit Maßeinheit BT-X-12-0.
+                            // Factur-X 1.09 allows either BT-161 or BT-X-12 per attribute (BR-FXEXT-BR-54-2), the data is written as given.
+                            _Writer.WriteStartElement("ram", "ValueMeasure", Profile.Extended);
+                            if (productCharacteristic.ValueMeasureUnitCode.HasValue)
+                            {
+                                _Writer.WriteAttributeString("unitCode", productCharacteristic.ValueMeasureUnitCode.Value.EnumToString());
+                            }
+                            _Writer.WriteValue(_formatDecimal(productCharacteristic.ValueMeasure.Value, 4));
+                            _Writer.WriteEndElement(); // !ram:ValueMeasure
+                        }
                         _Writer.WriteOptionalElementString("ram", "Value", productCharacteristic.Value); // BT-161
                         _Writer.WriteEndElement(); // !ram:ApplicableProductCharacteristic
                     }
@@ -258,6 +287,10 @@ namespace Envisia.InvoiceXml
                     _Writer.WriteEndElement(); // !ram:OriginTradeCountry
                 }
 
+                // ManufacturerTradeParty, Detailinformationen zum Hersteller (Factur-X 1.09 / ZUGFeRD 2.5, Extended)
+                // order as required by the schema: after OriginTradeCountry, before IncludedReferencedProduct
+                _writeOptionalParty(_Writer, PartyTypes.ManufacturerTradeParty, tradeLineItem.Manufacturer, Profile.Extended);
+
                 if ((descriptor.Profile == Profile.Extended) && (tradeLineItem.IncludedReferencedProducts?.Any() == true)) // BG-X-1
                 {
                     foreach (var includedItem in tradeLineItem.IncludedReferencedProducts)
@@ -291,6 +324,17 @@ namespace Envisia.InvoiceXml
                 if (descriptor.Profile.In(Profile.Basic, Profile.Comfort, Profile.Extended, Profile.XRechnung, Profile.XRechnung1))
                 {
                     _Writer.WriteStartElement("ram", "SpecifiedLineTradeAgreement", Profile.Basic | Profile.Comfort | Profile.Extended | Profile.XRechnung1 | Profile.XRechnung);
+
+                    #region ApplicableTradeDeliveryTerms (Extended)
+                    // BG-X-87, first child of SpecifiedLineTradeAgreement
+                    if (tradeLineItem.ApplicableTradeDeliveryTermsCode.HasValue)
+                    {
+                        _Writer.WriteStartElement("ram", "ApplicableTradeDeliveryTerms", Profile.Extended);
+                        _Writer.WriteElementString("ram", "DeliveryTypeCode", EnumExtensions.EnumToString<TradeDeliveryTermCodes>(tradeLineItem.ApplicableTradeDeliveryTermsCode)); // BT-X-562
+                        _writeOptionalTradeLocation(_Writer, tradeLineItem.ApplicableTradeDeliveryTermsLocation); // BG-X-89: BT-X-565, BT-X-566
+                        _Writer.WriteEndElement(); // !ram:ApplicableTradeDeliveryTerms
+                    }
+                    #endregion
 
                     #region SellerOrderReferencedDocument (Extended)
                     if (tradeLineItem.SellerOrderReferencedDocument != null &&
@@ -433,6 +477,11 @@ namespace Envisia.InvoiceXml
                     _Writer.WriteEndElement(); // ram:NetPriceProductTradePrice(Basic|Comfort|Extended|XRechnung)
                     #endregion // !NetPriceProductTradePrice(Basic|Comfort|Extended|XRechnung)
 
+                    #region ItemSellerTradeParty (Extended)
+                    // BG-X-90, abweichender Verkäufer der Position
+                    _writeOptionalParty(_Writer, PartyTypes.ItemSellerTradeParty, tradeLineItem.ItemSeller, Profile.Extended, null, null, tradeLineItem.GetItemSellerTaxRegistration());
+                    #endregion
+
                     #region UltimateCustomerOrderReferencedDocument
                     // TODO: UltimateCustomerOrderReferencedDocument
                     #endregion
@@ -450,6 +499,11 @@ namespace Envisia.InvoiceXml
                 if (tradeLineItem.PackageQuantity.HasValue)
                 {
                     _writeElementWithAttributeWithPrefix(_Writer, "ram", "PackageQuantity", "unitCode", tradeLineItem.PackageUnitCode.EnumToString(), _formatDecimal(tradeLineItem.PackageQuantity, 4), Profile.Extended);
+                }
+                if (tradeLineItem.PerPackageUnitQuantity.HasValue)
+                {
+                    // BT-X-561, Anzahl der Einheiten pro Packstück
+                    _writeElementWithAttributeWithPrefix(_Writer, "ram", "PerPackageUnitQuantity", "unitCode", tradeLineItem.PerPackageUnitCode.EnumToString(), _formatDecimal(tradeLineItem.PerPackageUnitQuantity, 4), Profile.Extended);
                 }
                 if (tradeLineItem.ShipTo != null)
                 {
@@ -587,6 +641,22 @@ namespace Envisia.InvoiceXml
                 _Writer.WriteValue(_formatDecimal(lineTotalAmount));
                 _Writer.WriteEndElement(); // !ram:LineTotalAmount
 
+                // further line totals, Extended only; only the line tax totals carry a currency
+                _writeOptionalAmount(_Writer, "ram", "ChargeTotalAmount", tradeLineItem.ChargeTotalAmount, 2, false, Profile.Extended); // BT-X-327
+                _writeOptionalAmount(_Writer, "ram", "AllowanceTotalAmount", tradeLineItem.AllowanceTotalAmount, 2, false, Profile.Extended); // BT-X-328
+                _writeOptionalAmount(_Writer, "ram", "TaxTotalAmount", tradeLineItem.TaxTotalAmount, 2, true, Profile.Extended); // BT-X-329, invoice currency
+
+                // BT-X-590: line tax total in accounting currency, only together with BT-6 (TaxCurrencyCode), see BT-111
+                if (writeAccountingCurrency && tradeLineItem.TaxTotalAmountInAccountingCurrency.HasValue)
+                {
+                    _Writer.WriteStartElement("ram", "TaxTotalAmount", Profile.Extended);
+                    _Writer.WriteAttributeString("currencyID", this._Descriptor.TaxCurrency.Value.EnumToString());
+                    _Writer.WriteValue(_formatDecimal(tradeLineItem.TaxTotalAmountInAccountingCurrency.Value, 2));
+                    _Writer.WriteEndElement(); // !ram:TaxTotalAmount
+                }
+
+                _writeOptionalAmount(_Writer, "ram", "GrandTotalAmount", tradeLineItem.GrandTotalAmount, 2, false, Profile.Extended); // BT-X-330
+
                 // Gesamtbetrag der Positionszu- und Abschläge; nur Extended, in EN 16931 nicht verwendet.
                 _writeOptionalAmount(_Writer, "ram", "TotalAllowanceChargeAmount", tradeLineItem.TotalAllowanceChargeAmount, 2, false, Profile.Extended);
                 _Writer.WriteEndElement(); // ram:SpecifiedTradeSettlementMonetarySummation
@@ -690,6 +760,7 @@ namespace Envisia.InvoiceXml
                 // BG-X-22, BT-X-145
                 _Writer.WriteStartElement("ram", "ApplicableTradeDeliveryTerms", Profile.Extended);
                 _Writer.WriteElementString("ram", "DeliveryTypeCode", EnumExtensions.EnumToString<TradeDeliveryTermCodes>(this._Descriptor.ApplicableTradeDeliveryTermsCode));
+                _writeOptionalTradeLocation(_Writer, this._Descriptor.ApplicableTradeDeliveryTermsLocation); // BG-X-88: BT-X-563, BT-X-564
                 _Writer.WriteEndElement(); // !ApplicableTradeDeliveryTerms
             }
             #endregion
@@ -896,6 +967,7 @@ namespace Envisia.InvoiceXml
             //  14. SpecifiedLogisticsServiceCharge (optional)
             //  15. SpecifiedTradePaymentTerms (optional)
             //  16. SpecifiedTradeSettlementHeaderMonetarySummation
+            //  16a. SpecifiedFinancialAdjustment (optional, EXTENDED only, Factur-X 1.09)
             //  17. InvoiceReferencedDocument (optional)
             //  18. ReceivableSpecifiedTradeAccountingAccount (optional)
             //  19. SpecifiedAdvancePayment (optional)
@@ -911,12 +983,7 @@ namespace Envisia.InvoiceXml
             _Writer.WriteOptionalElementString("ram", "PaymentReference", this._Descriptor.PaymentReference, ALL_PROFILES ^ Profile.Minimum);
 
             //   3. TaxCurrencyCode (optional)
-            //   BT-6
-            // BR-53 verlangt BT-111 zu BT-6; R005 verlangt eine von BT-5 abweichende Währung.
-            // Die gemeinsame Bedingung verhindert BT-6 ohne tatsächlich ausgegebenen Betrag.
-            bool writeAccountingCurrency = this._Descriptor.TaxCurrency.HasValue &&
-                this._Descriptor.TaxCurrency.Value != this._Descriptor.Currency &&
-                this._Descriptor.TaxTotalAmountInAccountingCurrency.HasValue;
+            //   BT-6, see writeAccountingCurrency
             if (writeAccountingCurrency)
             {
                 _Writer.WriteElementString("ram", "TaxCurrencyCode", this._Descriptor.TaxCurrency.Value.EnumToString(), profile: Profile.Comfort | Profile.Extended | Profile.XRechnung1 | Profile.XRechnung);
@@ -1012,6 +1079,14 @@ namespace Envisia.InvoiceXml
                     // the other profiles only know the IBAN of the debtor account.
                     _Writer.WriteOptionalElementString("ram", "AccountName", account.Name, Profile.Extended);
                     _Writer.WriteEndElement(); // !PayerPartyDebtorFinancialAccount
+
+                    // The BIC of the debtor was added to EXTENDED with Factur-X 1.09 / ZUGFeRD 2.5 as well.
+                    if (!String.IsNullOrWhiteSpace(account.BIC))
+                    {
+                        _Writer.WriteStartElement("ram", "PayerSpecifiedDebtorFinancialInstitution", Profile.Extended);
+                        _Writer.WriteElementString("ram", "BICID", account.BIC);
+                        _Writer.WriteEndElement(); // !PayerSpecifiedDebtorFinancialInstitution
+                    }
 
                     _Writer.WriteEndElement(); // !SpecifiedTradeSettlementPaymentMeans
                 }
@@ -1297,6 +1372,18 @@ namespace Envisia.InvoiceXml
             _Writer.WriteEndElement(); // !ram:SpecifiedTradeSettlementMonetarySummation
             #endregion
 
+            #region SpecifiedFinancialAdjustment
+            //  16a. SpecifiedFinancialAdjustment (optional, EXTENDED only, Factur-X 1.09 / ZUGFeRD 2.5)
+            //  The amounts are part of BT-115 according to BR-FXEXT-CO-16.
+            foreach (FinancialAdjustment financialAdjustment in this._Descriptor.GetFinancialAdjustments())
+            {
+                _Writer.WriteStartElement("ram", "SpecifiedFinancialAdjustment", Profile.Extended);
+                _Writer.WriteElementString("ram", "Reason", financialAdjustment.Reason);
+                _Writer.WriteElementString("ram", "ActualAmount", _formatDecimal(financialAdjustment.ActualAmount)); // without currency
+                _Writer.WriteEndElement(); // !ram:SpecifiedFinancialAdjustment
+            }
+            #endregion
+
             #region InvoiceReferencedDocument
             foreach (InvoiceReferencedDocument invoiceReferencedDocument in this._Descriptor.GetInvoiceReferencedDocuments())
             {
@@ -1438,6 +1525,43 @@ namespace Envisia.InvoiceXml
                 }
             }
         } // !_validateAdvancePayments()
+
+
+        /// <summary>
+        /// Checks the mandatory data of the financial adjustments (SpecifiedFinancialAdjustment) before serialization.
+        /// </summary>
+        private void _validateFinancialAdjustments()
+        {
+            if (this._Descriptor.Profile != Profile.Extended || this._Descriptor.FinancialAdjustments == null)
+            {
+                return;
+            }
+
+            if (this._Descriptor.FinancialAdjustments.Any(financialAdjustment => financialAdjustment == null || String.IsNullOrWhiteSpace(financialAdjustment.Reason)))
+            {
+                throw new MissingDataException("Financial adjustment reason is required (SpecifiedFinancialAdjustment).");
+            }
+        } // !_validateFinancialAdjustments()
+
+
+        /// <summary>
+        /// Writes the location that is relevant for the delivery terms (RelevantTradeLocation), document level BG-X-88, line level BG-X-89.
+        /// </summary>
+        private void _writeOptionalTradeLocation(ProfileAwareXmlTextWriter writer, TradeLocation location)
+        {
+            if (location == null)
+            {
+                return;
+            }
+
+            writer.WriteStartElement("ram", "RelevantTradeLocation", Profile.Extended);
+            if (location.Country.HasValue)
+            {
+                writer.WriteElementString("ram", "CountryID", location.Country.Value.EnumToString()); // BT-X-563, BT-X-565
+            }
+            writer.WriteOptionalElementString("ram", "Name", location.Name); // BT-X-564, BT-X-566
+            writer.WriteEndElement(); // !ram:RelevantTradeLocation
+        } // !_writeOptionalTradeLocation()
 
 
         private void _WriteDocumentLevelSpecifiedTradeAllowanceCharge(ProfileAwareXmlTextWriter writer, AbstractTradeAllowanceCharge tradeAllowanceCharge)
@@ -1910,6 +2034,8 @@ namespace Envisia.InvoiceXml
                 case PartyTypes.SalesAgentTradeParty:
                 case PartyTypes.ShipFromTradeParty:
                 case PartyTypes.UltimateShipToTradeParty:
+                case PartyTypes.ItemSellerTradeParty:
+                case PartyTypes.ManufacturerTradeParty:
                     if (this._Descriptor.Profile != Profile.Extended) { return; }
                     break;
                 default:
@@ -1994,6 +2120,12 @@ namespace Envisia.InvoiceXml
                 case PartyTypes.InvoicerTradeParty:
                     writer.WriteStartElement("ram", "InvoicerTradeParty", profile);
                     break;
+                case PartyTypes.ItemSellerTradeParty:
+                    writer.WriteStartElement("ram", "ItemSellerTradeParty", profile);
+                    break;
+                case PartyTypes.ManufacturerTradeParty:
+                    writer.WriteStartElement("ram", "ManufacturerTradeParty", profile);
+                    break;
                 default:
                     return;
             }
@@ -2057,7 +2189,9 @@ namespace Envisia.InvoiceXml
                 // for buyer : BT-48
                 foreach (TaxRegistration taxRegistration in taxRegistrations.Where(tr => !String.IsNullOrWhiteSpace(tr.No)))
                 {
-                    // FC allowed only in Comfort, Extended and XRechnung profile for SellerTradeParty (and TODO: ItemSellerTradeParty)
+                    // FC allowed only in Comfort, Extended and XRechnung profile for SellerTradeParty.
+                    // ItemSellerTradeParty: the Factur-X 1.08 spec lists a local tax ID (BT-X-588), but BR-FXEXT-03 of the
+                    // Factur-X 1.09.2 schematron only allows VAT IDs for every party except SellerTradeParty, so FC is omitted there as well.
                     if (taxRegistration.SchemeID == TaxRegistrationSchemeID.FC
                         && !(partyType == PartyTypes.SellerTradeParty && this._Descriptor.Profile.In(Profile.Extended, Profile.Comfort, Profile.XRechnung1, Profile.XRechnung)))
                     {

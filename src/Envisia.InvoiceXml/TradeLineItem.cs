@@ -121,11 +121,66 @@ namespace Envisia.InvoiceXml
         public decimal? PackageQuantity { get; set; }
 
         /// <summary>
+        /// Number of units per package
+        ///
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-561
+        /// </summary>
+        public decimal? PerPackageUnitQuantity { get; set; }
+
+        /// <summary>
         /// Invoice line net amount including (!) trade allowance charges for the line item
         ///
         /// BT-131
         /// </summary>
         public decimal? LineTotalAmount { get; set; }
+
+        /// <summary>
+        /// Total amount of the charges on line level
+        ///
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-327
+        /// </summary>
+        public decimal? ChargeTotalAmount { get; set; }
+
+        /// <summary>
+        /// Total amount of the allowances on line level
+        ///
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-328
+        /// </summary>
+        public decimal? AllowanceTotalAmount { get; set; }
+
+        /// <summary>
+        /// Total VAT amount of the line item in invoice currency (BT-5)
+        ///
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-329
+        /// </summary>
+        public decimal? TaxTotalAmount { get; set; }
+
+        /// <summary>
+        /// Total VAT amount of the line item in the VAT accounting currency (BT-6, InvoiceDescriptor.TaxCurrency)
+        ///
+        /// Only written in profile Extended and only if the invoice also contains the VAT total amount
+        /// in accounting currency (BT-111), i.e. if the VAT accounting currency is written.
+        ///
+        /// BT-X-590
+        /// </summary>
+        public decimal? TaxTotalAmountInAccountingCurrency { get; set; }
+
+        /// <summary>
+        /// Gross amount of the line item (including VAT)
+        ///
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-330
+        /// </summary>
+        public decimal? GrandTotalAmount { get; set; }
 
         /// <summary>
         /// Gesamtbetrag der Zu- und Abschläge auf Positionsebene
@@ -235,7 +290,14 @@ namespace Envisia.InvoiceXml
         /// BT-X-47-0
         /// </summary>
         public QuantityCodes? PackageUnitCode { get; set; }
-        
+
+        /// <summary>
+        /// Unit code of the number of units per package
+        ///
+        /// BT-X-561-0
+        /// </summary>
+        public QuantityCodes? PerPackageUnitCode { get; set; }
+
         /// <summary>
         /// Identifier of the invoice line item
         ///
@@ -350,6 +412,49 @@ namespace Envisia.InvoiceXml
         /// BG-X-10
         /// </summary>
         public Party UltimateShipTo { get; set; }
+
+
+        /// <summary>
+        /// Delivery terms of the line item (code). This information is optional and only relevant for Extended profile
+        ///
+        /// BT-X-562
+        /// </summary>
+        public TradeDeliveryTermCodes? ApplicableTradeDeliveryTermsCode { get; set; }
+
+
+        /// <summary>
+        /// Location that is relevant for the delivery terms of the line item.
+        /// It is only written together with the delivery terms code (ApplicableTradeDeliveryTermsCode) and only in Extended profile
+        ///
+        /// BG-X-89
+        /// </summary>
+        public TradeLocation ApplicableTradeDeliveryTermsLocation { get; set; }
+
+
+        /// <summary>
+        /// Detailed information on the deviating seller of the item (e.g. on marketplaces).
+        /// This party is optional and only relevant for Extended profile
+        ///
+        /// BG-X-90
+        /// </summary>
+        public Party ItemSeller { get; set; }
+
+
+        /// <summary>
+        /// Tax registrations of the deviating item seller: VAT identifier (BT-X-587) and local tax identifier (BT-X-588).
+        /// Please use AddItemSellerTaxRegistration() to add a registration.
+        ///
+        /// Only the VAT identifier (scheme VA) is written: BR-FXEXT-03 of Factur-X 1.09.2 does not allow other tax registrations
+        /// for parties other than the seller.
+        /// </summary>
+        public List<TaxRegistration> ItemSellerTaxRegistration { get; internal set; } = new List<TaxRegistration>();
+
+
+        /// <summary>
+        /// Detailed information on the manufacturer of the item.
+        /// This party is optional and only relevant for Extended profile (introduced with Factur-X 1.09 / ZUGFeRD 2.5)
+        /// </summary>
+        public Party Manufacturer { get; set; }
 
 
         /// <summary>
@@ -768,7 +873,7 @@ namespace Envisia.InvoiceXml
 
         /// <summary>
         /// Adds an invoice line Buyer accounting reference. BT-133
-        /// Please note that XRechnung/ FacturX allows a maximum of one such reference
+        /// Please note that XRechnung/ FacturX allows a maximum of one such reference, only the Extended profile allows several
         /// </summary>
         /// <param name="AccountID">The accounting reference identifier</param>
         /// <param name="AccountTypeCode">Type of the account - optional</param>
@@ -861,6 +966,78 @@ namespace Envisia.InvoiceXml
         } // !SetPackageQuantity()
 
 
+        /// <summary>
+        /// Sets the number of units per package, at line level, in this trade delivery.
+        /// Only written in profile Extended.
+        ///
+        /// BT-X-561
+        /// </summary>
+        /// <param name="perPackageUnitQuantity">Number of units per package</param>
+        /// <param name="perPackageUnitCode">Unit code for the quantity</param>
+        public TradeLineItem SetPerPackageUnitQuantity(decimal perPackageUnitQuantity, QuantityCodes perPackageUnitCode)
+        {
+            PerPackageUnitQuantity = perPackageUnitQuantity;
+            PerPackageUnitCode = perPackageUnitCode;
+            return this;
+        } // !SetPerPackageUnitQuantity()
+
+
+        /// <summary>
+        /// Sets the delivery terms of the line item, optionally including the location that is relevant for the delivery terms.
+        /// Only written in profile Extended.
+        ///
+        /// BG-X-87
+        /// </summary>
+        /// <param name="deliveryTypeCode">Delivery terms (code), BT-X-562</param>
+        /// <param name="locationCountry">Country code of the relevant location, BT-X-565</param>
+        /// <param name="locationName">Name of the relevant location, BT-X-566</param>
+        public TradeLineItem SetApplicableTradeDeliveryTerms(TradeDeliveryTermCodes deliveryTypeCode, CountryCodes? locationCountry = null, string locationName = null)
+        {
+            this.ApplicableTradeDeliveryTermsCode = deliveryTypeCode;
+            if (locationCountry.HasValue || !String.IsNullOrWhiteSpace(locationName))
+            {
+                this.ApplicableTradeDeliveryTermsLocation = new TradeLocation()
+                {
+                    Country = locationCountry,
+                    Name = locationName
+                };
+            }
+            else
+            {
+                this.ApplicableTradeDeliveryTermsLocation = null;
+            }
+            return this;
+        } // !SetApplicableTradeDeliveryTerms()
+
+
+        /// <summary>
+        /// Adds a tax registration of the deviating item seller (ItemSeller).
+        /// Please note that only the VAT identifier (scheme VA, BT-X-587) is written, see BR-FXEXT-03 of Factur-X 1.09.2.
+        ///
+        /// BT-X-587 (VAT identifier), BT-X-588 (local tax identifier)
+        /// </summary>
+        /// <param name="no">The tax registration number</param>
+        /// <param name="schemeID">The tax registration scheme identifier</param>
+        public TradeLineItem AddItemSellerTaxRegistration(string no, TaxRegistrationSchemeID schemeID)
+        {
+            this.ItemSellerTaxRegistration.Add(new TaxRegistration()
+            {
+                No = no,
+                SchemeID = schemeID
+            });
+            return this;
+        } // !AddItemSellerTaxRegistration()
+
+
+        /// <summary>
+        /// Returns the tax registrations of the deviating item seller
+        /// </summary>
+        public List<TaxRegistration> GetItemSellerTaxRegistration()
+        {
+            return this.ItemSellerTaxRegistration;
+        } // !GetItemSellerTaxRegistration()
+
+
         public TradeLineItem SetBillingPeriod(DateTime? billingPeriodStart, DateTime? billingPeriodEnd)
         {
             this.BillingPeriodStart = billingPeriodStart;
@@ -869,12 +1046,42 @@ namespace Envisia.InvoiceXml
         } // !SetBillingPeriod()
 
 
-        public void AddApplicableProductCharacteristic(string description, string value)
+        /// <summary>
+        /// Adds an item attribute (BG-32)
+        /// </summary>
+        /// <param name="description">Item attribute name, BT-160</param>
+        /// <param name="value">Item attribute value, BT-161</param>
+        /// <param name="typeCode">Item attribute code (UNTDID 6313 + Factur-X extension), BT-X-11, written in profile Extended only</param>
+        public void AddApplicableProductCharacteristic(string description, string value, string typeCode = null)
         {
             this.ApplicableProductCharacteristics.Add(new ApplicableProductCharacteristic()
             {
+                TypeCode = typeCode,
                 Description = description,
                 Value = value
+            });
+        } // !AddApplicableProductCharacteristic()
+
+
+        /// <summary>
+        /// Adds an item attribute (BG-32) whose value is a measure with unit of measure (BT-X-12).
+        ///
+        /// The measure is written in profile Extended only. Factur-X 1.09 allows either an item attribute value (BT-161)
+        /// or a measure (BT-X-12) per attribute, but not both (BR-FXEXT-BR-54-2). The profiles according to EN 16931
+        /// require BT-160 and BT-161, so an attribute without them is omitted there.
+        /// </summary>
+        /// <param name="description">Item attribute name, BT-160</param>
+        /// <param name="valueMeasure">Item attribute value as measure, BT-X-12</param>
+        /// <param name="valueMeasureUnitCode">Unit of measure of the value, BT-X-12-0</param>
+        /// <param name="typeCode">Item attribute code (UNTDID 6313 + Factur-X extension), BT-X-11</param>
+        public void AddApplicableProductCharacteristic(string description, decimal valueMeasure, QuantityCodes valueMeasureUnitCode, string typeCode = null)
+        {
+            this.ApplicableProductCharacteristics.Add(new ApplicableProductCharacteristic()
+            {
+                TypeCode = typeCode,
+                Description = description,
+                ValueMeasure = valueMeasure,
+                ValueMeasureUnitCode = valueMeasureUnitCode
             });
         } // !AddApplicableProductCharacteristic()
     }
