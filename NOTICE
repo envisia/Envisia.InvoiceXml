@@ -1,12 +1,12 @@
 Envisia.InvoiceXml
-Copyright envisia and the ZUGFeRD-csharp contributors
+Copyright envisia GmbH and the ZUGFeRD-csharp contributors
 
 This product is a derivative work of ZUGFeRD-csharp
 (https://github.com/stephanstapel/ZUGFeRD-csharp),
 Copyright 2013-2026 Stephan Stapel / STwo Industries GmbH and contributors,
 licensed under the Apache License, Version 2.0.
 
-Changes made by envisia include, among others: renaming the library, package
+Changes made by envisia GmbH include, among others: renaming the library, package
 and namespace to Envisia.InvoiceXml, removing the PDF, rendering and Excel
 companion projects, and updating the implementation to newer versions of the
 ZUGFeRD / Factur-X / EN 16931 specifications. See CHANGELOG.md for details.
