@@ -1674,16 +1674,6 @@ namespace Envisia.InvoiceXml
                 _Writer.WriteElementString("ram", "TypeCode", EnumExtensions.EnumToString<AdditionalReferencedDocumentTypeCode>(document.TypeCode.Value));
             }
 
-            if (document.ReferenceTypeCode.HasValue)
-            {
-                // CII-DT-024: ReferenceTypeCode is only allowed in BT-18-00 and BT-128-00 for InvoiceDataSheet
-                if (((parentElement == "BT-18-00" || parentElement == "BT-128-00") && document.TypeCode == AdditionalReferencedDocumentTypeCode.InvoiceDataSheet)
-                    || parentElement == "BG-X-3")
-                {
-                    _Writer.WriteOptionalElementString("ram", "ReferenceTypeCode", document.ReferenceTypeCode.Value.EnumToString()); // BT-128-1, BT-18-1, BT-X-32
-                }
-            }
-
             if (parentElement == "BG-24" || parentElement == "BG-X-3")
             {
                 _Writer.WriteOptionalElementString("ram", "Name", document.Name, subProfile); // BT-123, BT-X-299
@@ -1696,6 +1686,17 @@ namespace Envisia.InvoiceXml
                 _Writer.WriteAttributeString("mimeCode", MimeTypeMapper.GetMimeType(document.Filename));
                 _Writer.WriteValue(Convert.ToBase64String(document.AttachmentBinaryObject));
                 _Writer.WriteEndElement(); // !AttachmentBinaryObject()
+            }
+
+            // schema order: ... Name, AttachmentBinaryObject, ReferenceTypeCode, FormattedIssueDateTime
+            if (document.ReferenceTypeCode.HasValue)
+            {
+                // CII-DT-024: ReferenceTypeCode is only allowed in BT-18-00 and BT-128-00 for InvoiceDataSheet
+                if (((parentElement == "BT-18-00" || parentElement == "BT-128-00") && document.TypeCode == AdditionalReferencedDocumentTypeCode.InvoiceDataSheet)
+                    || parentElement == "BG-X-3")
+                {
+                    _Writer.WriteOptionalElementString("ram", "ReferenceTypeCode", document.ReferenceTypeCode.Value.EnumToString()); // BT-128-1, BT-18-1, BT-X-32
+                }
             }
 
             if (document.IssueDateTime.HasValue)

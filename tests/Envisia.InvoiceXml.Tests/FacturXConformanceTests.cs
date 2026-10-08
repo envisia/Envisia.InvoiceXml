@@ -200,6 +200,31 @@ namespace Envisia.InvoiceXml.Tests
         } // !TestReadsAlternativeGuidelineIdentifiers()
 
 
+        /// <summary>
+        /// The reference type code of an additional referenced document (BT-X-32 on line level) comes after name and attachment in the schema.
+        /// </summary>
+        [TestMethod]
+        [DataRow(SchemaValidator.FacturX108)]
+        [DataRow(SchemaValidator.FacturX1092)]
+        public void TestLineAdditionalReferencedDocumentIsSchemaValid(string schemaVersion)
+        {
+            InvoiceDescriptor desc = _InvoiceProvider.CreateInvoice();
+            TradeLineItem item = desc.TradeLineItems.First();
+            item.AddAdditionalReferencedDocument("OBJ-4711", AdditionalReferencedDocumentTypeCode.InvoiceDataSheet, ReferenceTypeCodes.AAA);
+            AdditionalReferencedDocument document = item.AdditionalReferencedDocuments.Last();
+            document.Name = "Object reference";
+            document.Filename = "object.pdf";
+            document.AttachmentBinaryObject = Encoding.UTF8.GetBytes("%PDF-1.7");
+
+            using MemoryStream ms = new MemoryStream();
+            desc.Save(ms, ZUGFeRDVersion.Version23, Profile.Extended);
+
+            List<string> errors = SchemaValidator.Validate(ms, SchemaValidator.GetFacturXSchemaPath(schemaVersion, Profile.Extended));
+            Assert.IsEmpty(errors, string.Join(Environment.NewLine, errors));
+            StringAssert.Contains(Encoding.UTF8.GetString(ms.ToArray()), "<ram:ReferenceTypeCode>AAA</ram:ReferenceTypeCode>");
+        } // !TestLineAdditionalReferencedDocumentIsSchemaValid()
+
+
         private static Profile _GetExampleProfile(string relativePath)
         {
             return InvoiceDescriptor.Load(Path.Combine(SchemaValidator.RepositoryRoot, "documentation", "zugferd240en", "Examples", relativePath)).Profile;
