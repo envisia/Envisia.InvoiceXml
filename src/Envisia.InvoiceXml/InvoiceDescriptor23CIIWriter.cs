@@ -1148,10 +1148,13 @@ namespace Envisia.InvoiceXml
                             dueDate = dueDate ?? paymentTerms.DueDate;
                         }
 
-                        _Writer.WriteStartElement("ram", "Description");
-                        _Writer.WriteRawString(sbPaymentNotes.ToString().TrimEnd()); // BT-20
-                        _Writer.WriteRawString("\n");
-                        _Writer.WriteEndElement(); // !ram:Description
+                        if (sbPaymentNotes.ToString().Trim().Length > 0)
+                        {
+                            _Writer.WriteStartElement("ram", "Description");
+                            _Writer.WriteRawString(sbPaymentNotes.ToString().TrimEnd()); // BT-20
+                            _Writer.WriteRawString("\n");
+                            _Writer.WriteEndElement(); // !ram:Description
+                        }
                         if (dueDate.HasValue)
                         {
                             _Writer.WriteStartElement("ram", "DueDateDateTime");
@@ -2012,7 +2015,7 @@ namespace Envisia.InvoiceXml
             writer.WriteOptionalElementString("ram", "Description", party.Description, PROFILE_COMFORT_EXTENDED_XRECHNUNG); // BT-33
 
             _writeOptionalLegalOrganization(writer, "ram", "SpecifiedLegalOrganization", party.SpecifiedLegalOrganization, partyType);
-            _writeOptionalContact(writer, "ram", "DefinedTradeContact", contact, PROFILE_COMFORT_EXTENDED_XRECHNUNG);
+            _writeOptionalContact(writer, "ram", "DefinedTradeContact", contact, PROFILE_COMFORT_EXTENDED_XRECHNUNG, partyType);
 
             // spec 2.3 says: Minimum/BuyerTradeParty does not include PostalTradeAddress
             bool isMinimumBuyer = (this._Descriptor.Profile == Profile.Minimum) && (partyType == PartyTypes.BuyerTradeParty);
@@ -2079,7 +2082,7 @@ namespace Envisia.InvoiceXml
         } // !_writeOptionalParty()
 
 
-        private void _writeOptionalContact(ProfileAwareXmlTextWriter writer, string prefix, string contactTag, Contact contact, Profile profile = Profile.Unknown)
+        private void _writeOptionalContact(ProfileAwareXmlTextWriter writer, string prefix, string contactTag, Contact contact, Profile profile = Profile.Unknown, PartyTypes partyType = PartyTypes.Unknown)
         {
             if (contact == null)
             {
@@ -2088,8 +2091,13 @@ namespace Envisia.InvoiceXml
 
             writer.WriteStartElement(prefix, contactTag, profile);
 
+            // For seller and buyer, PersonName and DepartmentName both represent BT-41 / BT-56 and must not
+            // occur together (CII-SR-465, CII-SR-466), so the department is only used without a person name.
             writer.WriteOptionalElementString("ram", "PersonName", contact.Name);
-            writer.WriteOptionalElementString("ram", "DepartmentName", contact.OrgUnit);
+            if (String.IsNullOrWhiteSpace(contact.Name) || !partyType.In(PartyTypes.SellerTradeParty, PartyTypes.BuyerTradeParty))
+            {
+                writer.WriteOptionalElementString("ram", "DepartmentName", contact.OrgUnit);
+            }
 
             if (!String.IsNullOrWhiteSpace(contact.PhoneNo))
             {

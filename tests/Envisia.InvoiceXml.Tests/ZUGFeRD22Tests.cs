@@ -2368,7 +2368,7 @@ namespace Envisia.InvoiceXml.Tests
             Assert.AreEqual(GlobalIDSchemeIdentifiers.GLN, loadedInvoice.Seller.GlobalID.SchemeID);
             Assert.AreEqual("4000001123452", loadedInvoice.Seller.GlobalID.ID);
             Assert.AreEqual("Max Mustermann", loadedInvoice.SellerContact.Name);
-            Assert.AreEqual("Muster-Einkauf", loadedInvoice.SellerContact.OrgUnit);
+            Assert.IsTrue(String.IsNullOrEmpty(loadedInvoice.SellerContact.OrgUnit)); // CII-SR-465
             Assert.AreEqual("Max@Mustermann.de", loadedInvoice.SellerContact.EmailAddress);
             Assert.AreEqual("+49891234567", loadedInvoice.SellerContact.PhoneNo);
 
@@ -3008,7 +3008,8 @@ namespace Envisia.InvoiceXml.Tests
             InvoiceDescriptor loadedInvoice = InvoiceDescriptor.Load(ms);
 
             Assert.AreEqual(sellerContact, loadedInvoice.SellerContact.Name);
-            Assert.AreEqual(orgUnit, loadedInvoice.SellerContact.OrgUnit);
+            // PersonName and DepartmentName must not occur together for the seller (CII-SR-465)
+            Assert.IsTrue(String.IsNullOrEmpty(loadedInvoice.SellerContact.OrgUnit));
             Assert.AreEqual(emailAddress, loadedInvoice.SellerContact.EmailAddress);
             Assert.AreEqual(phoneNo, loadedInvoice.SellerContact.PhoneNo);
             Assert.AreEqual(faxNo, loadedInvoice.SellerContact.FaxNo);

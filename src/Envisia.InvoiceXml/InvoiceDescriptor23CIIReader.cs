@@ -490,7 +490,7 @@ namespace Envisia.InvoiceXml
             {
                 retval.AddReceivableSpecifiedTradeAccountingAccount(
                     AccountID: XmlUtils.NodeAsString(node, ".//ram:ID", nsmgr),
-                    AccountTypeCode: XmlUtils.NodeAsEnum<AccountingAccountTypeCodes>(node, ".//ram:TypeCode", nsmgr)
+                    AccountTypeCode: EnumExtensions.StringToNullableEnum<AccountingAccountTypeCodes>(XmlUtils.NodeAsString(node, ".//ram:TypeCode", nsmgr))
                 );
             }
 
@@ -985,7 +985,7 @@ namespace Envisia.InvoiceXml
             return new AdditionalReferencedDocument
             {
                 ID = XmlUtils.NodeAsString(node, "ram:IssuerAssignedID", nsmgr),
-                TypeCode = EnumExtensions.StringToEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, "ram:TypeCode", nsmgr)),
+                TypeCode = EnumExtensions.StringToNullableEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, "ram:TypeCode", nsmgr)),
                 Name = XmlUtils.NodeAsString(node, "ram:Name", nsmgr),
                 IssueDateTime = DataTypeReader.ReadFormattedIssueDateTime(node, "ram:FormattedIssueDateTime", nsmgr),
                 AttachmentBinaryObject = !string.IsNullOrWhiteSpace(strBase64BinaryData) ? Convert.FromBase64String(strBase64BinaryData) : null,

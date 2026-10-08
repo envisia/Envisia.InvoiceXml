@@ -320,11 +320,17 @@ namespace Envisia.InvoiceXml
                         _Writer.WriteOptionalElementString("cbc", "ID", this._Descriptor.ShipTo.ID.ID);
                     }
                     _Writer.WriteStartElement("cac", "Address");
-                    _Writer.WriteOptionalElementString("cbc", "StreetName", this._Descriptor.ShipTo.Street);
-                    _Writer.WriteOptionalElementString("cbc", "AdditionalStreetName", this._Descriptor.ShipTo.AddressLine3);
+                    _Writer.WriteOptionalElementString("cbc", "StreetName", this._Descriptor.ShipTo.Street); // BT-75
+                    _Writer.WriteOptionalElementString("cbc", "AdditionalStreetName", this._Descriptor.ShipTo.Street2); // BT-76
                     _Writer.WriteOptionalElementString("cbc", "CityName", this._Descriptor.ShipTo.City);
                     _Writer.WriteOptionalElementString("cbc", "PostalZone", this._Descriptor.ShipTo.Postcode);
                     _Writer.WriteOptionalElementString("cbc", "CountrySubentity", this._Descriptor.ShipTo.CountrySubdivisionName);
+                    if (!string.IsNullOrWhiteSpace(this._Descriptor.ShipTo.AddressLine3))
+                    {
+                        _Writer.WriteStartElement("cac", "AddressLine");
+                        _Writer.WriteOptionalElementString("cbc", "Line", this._Descriptor.ShipTo.AddressLine3); // BT-165
+                        _Writer.WriteEndElement(); // !AddressLine
+                    }
                     _Writer.WriteStartElement("cac", "Country");
                     if (this._Descriptor.ShipTo.Country.HasValue)
                     {
@@ -1087,15 +1093,16 @@ namespace Envisia.InvoiceXml
                 writer.WriteStartElement("cac", "PostalAddress");
                 _Writer.WriteOptionalElementString("cbc", "StreetName", party.Street);
                 _Writer.WriteOptionalElementString("cbc", "AdditionalStreetName", party.Street2);
+                _Writer.WriteElementString("cbc", "CityName", party.City);
+                _Writer.WriteElementString("cbc", "PostalZone", party.Postcode);
+                _Writer.WriteOptionalElementString("cbc", "CountrySubentity", party.CountrySubdivisionName);
+                // UBL schema order: AddressLine (BT-163) follows CountrySubentity and precedes Country
                 if (!string.IsNullOrWhiteSpace(party.AddressLine3))
                 {
                     writer.WriteStartElement("cac", "AddressLine");
                     _Writer.WriteOptionalElementString("cbc", "Line", party.AddressLine3);
                     writer.WriteEndElement(); //!AddressLine
                 }
-                _Writer.WriteElementString("cbc", "CityName", party.City);
-                _Writer.WriteElementString("cbc", "PostalZone", party.Postcode);
-                _Writer.WriteOptionalElementString("cbc", "CountrySubentity", party.CountrySubdivisionName);
 
                 writer.WriteStartElement("cac", "Country");
                 if (party.Country.HasValue)

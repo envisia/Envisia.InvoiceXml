@@ -99,7 +99,17 @@ namespace Envisia.InvoiceXml.Tests
                 {
                     XmlResolver = new XmlUrlResolver()
                 };
-                set.Add(null, path);
+
+                // the UBL signature module (xmldsig) contains a DTD
+                XmlReaderSettings schemaReaderSettings = new XmlReaderSettings
+                {
+                    DtdProcessing = DtdProcessing.Parse,
+                    XmlResolver = new XmlUrlResolver()
+                };
+                using (XmlReader schemaReader = XmlReader.Create(path, schemaReaderSettings))
+                {
+                    set.Add(null, schemaReader);
+                }
                 set.Compile();
                 return set;
             });
@@ -123,6 +133,15 @@ namespace Envisia.InvoiceXml.Tests
 
             return errors;
         } // !Validate()
+
+
+        /// <summary>
+        /// Returns the path of the OASIS UBL 2.1 schema for invoices or credit notes.
+        /// </summary>
+        internal static string GetUblSchemaPath(bool creditNote)
+        {
+            return Path.Combine(RepositoryRoot, "documentation", "ubl21", "xsd", "maindoc", creditNote ? "UBL-CreditNote-2.1.xsd" : "UBL-Invoice-2.1.xsd");
+        } // !GetUblSchemaPath()
 
 
         private static string _FindRepositoryRoot()

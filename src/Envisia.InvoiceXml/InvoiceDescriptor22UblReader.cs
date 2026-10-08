@@ -475,7 +475,7 @@ namespace Envisia.InvoiceXml
                 {
                     ID = XmlUtils.NodeAsString(node, ".//cbc:ID", nsmgr),
                     ReferenceTypeCode = EnumExtensions.StringToNullableEnum<ReferenceTypeCodes>(XmlUtils.NodeAsString(node, ".//cbc:ID/@schemeID", nsmgr)),
-                    TypeCode = EnumExtensions.StringToEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, ".//cbc:DocumentTypeCode", nsmgr)),
+                    TypeCode = EnumExtensions.StringToNullableEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, ".//cbc:DocumentTypeCode", nsmgr)),
                     Name = XmlUtils.NodeAsString(node, ".//cbc:DocumentDescription", nsmgr)
                 };
 
@@ -637,7 +637,7 @@ namespace Envisia.InvoiceXml
                 {
                     ID = XmlUtils.NodeAsString(node, ".//cbc:ID", nsmgr),
                     ReferenceTypeCode = EnumExtensions.StringToNullableEnum<ReferenceTypeCodes>(XmlUtils.NodeAsString(node, ".//cbc:ID/@schemeID", nsmgr)),
-                    TypeCode = EnumExtensions.StringToEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, ".//cbc:DocumentTypeCode", nsmgr)),
+                    TypeCode = EnumExtensions.StringToNullableEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, ".//cbc:DocumentTypeCode", nsmgr)),
                     Name = XmlUtils.NodeAsString(node, ".//cbc:DocumentDescription", nsmgr)
                 };
 
@@ -974,7 +974,7 @@ namespace Envisia.InvoiceXml
             return new AdditionalReferencedDocument
             {
                 ID = XmlUtils.NodeAsString(node, "ram:IssuerAssignedID", nsmgr),
-                TypeCode = EnumExtensions.StringToEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, "ram:TypeCode", nsmgr)),
+                TypeCode = EnumExtensions.StringToNullableEnum<AdditionalReferencedDocumentTypeCode>(XmlUtils.NodeAsString(node, "ram:TypeCode", nsmgr)),
                 Name = XmlUtils.NodeAsString(node, "ram:Name", nsmgr),
                 IssueDateTime = XmlUtils.NodeAsDateTime(node, "ram:FormattedIssueDateTime/qdt:DateTimeString", nsmgr),
                 AttachmentBinaryObject = !string.IsNullOrWhiteSpace(strBase64BinaryData) ? Convert.FromBase64String(strBase64BinaryData) : null,
