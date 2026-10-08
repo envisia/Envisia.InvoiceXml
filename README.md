@@ -1,189 +1,132 @@
-# ZUGFeRD-CSharp – Next Chapter
+# Envisia.InvoiceXml
 
-[![NuGet](https://img.shields.io/nuget/v/ZUGFeRD-CSharp?style=flat-square&logo=nuget&label=NuGet)](https://www.nuget.org/packages/ZUGFeRD-CSharp)
-![Status](https://img.shields.io/badge/status-maintenance%20only-orange?style=flat-square)
-[![Recommended](https://img.shields.io/badge/recommended-FactoorSharp-blue?style=flat-square)](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+[![CI](https://github.com/envisia/ZUGFeRD-csharp/actions/workflows/ci.yml/badge.svg)](https://github.com/envisia/ZUGFeRD-csharp/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/Envisia.InvoiceXml?logo=nuget)](https://www.nuget.org/packages/Envisia.InvoiceXml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE.txt)
 
+A .NET library to **create and read structured electronic invoices according to EN 16931** –
+ZUGFeRD, Factur-X and XRechnung – in both EN 16931 syntaxes, UN/CEFACT **CII** and OASIS **UBL**.
 
-> [!IMPORTANT]
-> ## FactoorSharp is the successor
->
-> ZUGFeRD-CSharp remains available as an open-source library. Bug fixes and stability improvements will continue to be published here.
->
-> All new features, support for upcoming e-invoicing standards, advanced validation, visualization, and professional support are provided through the commercial successor **FactoorSharp**.
->
-> For new projects and long-term production use, we recommend:
->
-> [https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+The library produces and parses the invoice XML. Embedding the XML into a PDF/A-3 (hybrid
+ZUGFeRD / Factur-X invoice) is intentionally left to the PDF library of your choice.
 
+## Supported standards
 
-## TL;DR
+| Standard | Versions | Profiles | Syntax | Read | Write |
+|---|---|---|---|---|---|
+| ZUGFeRD 1.0 | 1.0 | BASIC, COMFORT, EXTENDED | CII D13B | ✔ | ✔ |
+| ZUGFeRD 2.0 | 2.0 | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D16B | ✔ | ✔ |
+| ZUGFeRD 2.1 – **2.5.2** / Factur-X 1.0 – **1.09.2** | `ZUGFeRDVersion.Version23` | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D22B | ✔ | ✔ |
+| XRechnung | 1.2 – **3.0.2** (writes 3.0.x) | XRechnung (CIUS) | CII and UBL 2.1 | ✔ | ✔ |
+| French e-reporting | | EREPORTING | CII | ✔ | ✔ |
 
-**Deutsch**
+The guideline identifiers (BT-24) did not change between Factur-X 1.0 and 1.09.2, therefore
+`ZUGFeRDVersion.Version23` covers every ZUGFeRD version from 2.1 up to the current 2.5.2.
+Elements that were added to the EXTENDED profile in ZUGFeRD 2.4 and 2.5 are only written when
+you fill them.
 
-- ZUGFeRD-CSharp bleibt Open Source.
-- Bugfixes bleiben öffentlich verfügbar.
-- Neue Features und die aktive Produktweiterentwicklung erfolgen ausschließlich in **FactoorSharp**.
-- FactoorSharp ist das kommerzielle Nachfolgeprodukt für neue Projekte und den langfristigen produktiven Einsatz.
-- Website: [https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+The test suite validates the generated XML against the **official schemas of Factur-X 1.08
+(ZUGFeRD 2.4) and Factur-X 1.09.2 (ZUGFeRD 2.5.2)** for every profile, round-trips all official
+ZUGFeRD 2.4 example invoices and validates XRechnung UBL output against the OASIS UBL 2.1 schemas.
 
-**English**
+## Installation
 
-- ZUGFeRD-CSharp remains open source.
-- Bug fixes remain publicly available.
-- New features and active product development are provided exclusively through **FactoorSharp**.
-- FactoorSharp is the commercial successor for new projects and long-term production use.
-- Website: [https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+```shell
+dotnet add package Envisia.InvoiceXml
+```
 
+Target frameworks: .NET 10, .NET 8, .NET Standard 2.0/2.1, .NET Framework 4.6.2 and 4.8.
 
-## Deutsch
+## Quick start
 
-### Ein neues Kapitel für ZUGFeRD-CSharp
+```csharp
+using Envisia.InvoiceXml;
 
-ZUGFeRD-CSharp wurde 2013 als Hobbyprojekt gestartet – mit dem Ziel, die Erstellung und Verarbeitung von ZUGFeRD-Rechnungen zu vereinfachen.
+InvoiceDescriptor invoice = InvoiceDescriptor.CreateInvoice("471102", new DateTime(2026, 3, 5), CurrencyCodes.EUR);
+invoice.BusinessProcess = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
+invoice.ReferenceOrderNo = "04011000-12345-34";                       // BT-10 buyer reference (Leitweg-ID)
 
-Heute setzen hunderte Unternehmen diese Bibliothek produktiv ein.
+invoice.SetSeller("Lieferant GmbH", "80333", "München", "Lieferantenstraße 20", CountryCodes.DE);
+invoice.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);
+invoice.SetSellerContact("Max Mustermann", emailAddress: "max@lieferant.de", phoneno: "+49 89 123456");
+invoice.SetSellerElectronicAddress("rechnung@lieferant.de", ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
-Mit dieser Verbreitung wächst auch die Verantwortung: Die Stabilität und Zukunftssicherheit der Bibliothek müssen langfristig gewährleistet sein.
+invoice.SetBuyer("Kunden AG", "69876", "Frankfurt", "Kundenstraße 15", CountryCodes.DE);
+invoice.SetBuyerElectronicAddress("einkauf@kunde.de", ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
-Die aktive Produktweiterentwicklung wird deshalb mit **FactoorSharp** als kommerziellem Nachfolgeprodukt fortgeführt.
+invoice.AddTradeLineItem(name: "Trennblätter A4", netUnitPrice: 9.90m, billedQuantity: 20m,
+                         unitCode: QuantityCodes.H87, taxType: TaxTypes.VAT,
+                         categoryCode: TaxCategoryCodes.S, taxPercent: 19m);
 
-Für neue Projekte, zukünftige Standards und den langfristigen produktiven Einsatz empfehlen wir:
+invoice.AddApplicableTradeTax(198.00m, 19m, 37.62m, TaxTypes.VAT, TaxCategoryCodes.S);
+invoice.SetTotals(lineTotalAmount: 198.00m, taxBasisAmount: 198.00m, taxTotalAmount: 37.62m,
+                  grandTotalAmount: 235.62m, duePayableAmount: 235.62m);
+invoice.SetPaymentMeans(PaymentMeansTypeCodes.SEPACreditTransfer);
+invoice.AddCreditorFinancialAccount("DE02120300000000202051", "BYLADEM1001");
+invoice.AddTradePaymentTerms("Zahlbar innerhalb von 30 Tagen ohne Abzug", new DateTime(2026, 4, 4));
 
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+// ZUGFeRD / Factur-X (CII), profile EN 16931
+invoice.Save("factur-x.xml", ZUGFeRDVersion.Version23, Profile.Comfort);
 
+// XRechnung 3.0 in UBL or CII syntax
+invoice.Save("xrechnung-ubl.xml", ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL);
+invoice.Save("xrechnung-cii.xml", ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.CII);
+```
 
-### FactoorSharp – kommerzielles Nachfolgeprodukt
-Die aktive kommerzielle Weiterentwicklung erfolgt mit **FactoorSharp**.
+Reading detects version, profile and syntax automatically:
 
-  - neue Features
-  - erweiterte Funktionalitäten
-  - Unterstützung kommender Standards
-  - professionelle Validierung und Visualisierung
-  - professioneller Support
+```csharp
+InvoiceDescriptor loaded = InvoiceDescriptor.Load("incoming-invoice.xml");
+Console.WriteLine($"{loaded.Profile}: {loaded.InvoiceNo} – {loaded.DuePayableAmount} {loaded.Currency}");
+```
 
-### Website
+`Profile.Comfort` is the EN 16931 profile. When you write an invoice in a smaller profile, the
+writer leaves out everything the profile does not know (for example, MINIMUM only keeps the
+document header and totals), so an invoice read from a richer profile can be written as a
+schema-valid invoice of a smaller one.
 
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
+### Calculation checks
 
-### NuGet
+`InvoiceValidator.Validate(invoice, ZUGFeRDVersion.Version23)` recalculates line totals, allowances/charges, the VAT
+breakdown and the document totals (BR-CO-*) and reports deviations. For full compliance
+checks of the generated XML use the official validators: the KoSIT validator for XRechnung and
+the Factur-X / ZUGFeRD Schematron (e.g. via [Mustang](https://www.mustangproject.org)).
 
-https://www.nuget.org/packages/FactoorSharp.FacturX
+More documentation:
 
-### GitHub – Issues und Diskussionen
+- [Getting started](docs/getting-started.md)
+- [Profiles and formats](docs/profiles-and-formats.md)
+- [ZUGFeRD details](docs/zugferd-details.md)
+- [References](docs/references.md)
 
-https://github.com/S2-Industries/FactoorSharp.FacturX
+## Migrating from ZUGFeRD-csharp
 
-### Warum lohnt sich FactoorSharp?
+Envisia.InvoiceXml is based on ZUGFeRD-csharp 18.0. The API is the same apart from:
 
-FactoorSharp bietet zusätzliche Funktionen, die über die grundlegende Verarbeitung von ZUGFeRD-Dateien hinausgehen und speziell auf produktive Einsatzszenarien ausgerichtet sind:
+- Package `ZUGFeRD-csharp` → `Envisia.InvoiceXml`, assembly `s2industries.ZUGFeRD` →
+  `Envisia.InvoiceXml`, namespace `s2industries.ZUGFeRD` → `Envisia.InvoiceXml`.
+- The PDF (`ZUGFeRD.PDF-csharp`), rendering and Excel companion packages are not part of this
+  project.
+- The writers follow the profile schemas strictly; see the [changelog](CHANGELOG.md) for the
+  behaviour changes (e.g. MINIMUM output, a single payment terms element in BASIC/EN 16931,
+  seller/buyer contact point).
 
-- **Validierungskomponente**  
-  Validierung von ZUGFeRD-, Factur-X- und PDF-Dateien mit etablierten Werkzeugen wie Mustang, Valitool und VeraPDF
+## Building and testing
 
-- **Visualisierungskomponente**  
-  Erstellung ansprechend gestalteter PDF-Darstellungen auf Basis der elektronischen Rechnungsdaten
+```shell
+dotnet build Envisia.InvoiceXml.sln
+dotnet test Envisia.InvoiceXml.sln
+```
 
-- **Integration kommender Standards**  
-  Frühzeitige Unterstützung neuer Anforderungen und Weiterentwicklungen rund um E-Invoicing
+The .NET 10 SDK is required (see `global.json`); the tests run on .NET 8 and .NET 10.
+The official specification packages and schemas used by the tests are in `documentation/`.
 
-- **Online-Tools und Services**  
-  Ergänzende Hilfsmittel zur Analyse, Validierung und Verarbeitung elektronischer Rechnungen
+Releases are published to nuget.org by pushing a version tag (`v1.2.3`); see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-- **Professioneller Support**  
-  Unterstützung beim produktiven Einsatz, bei technischen Fragen und bei der Integration
+## License and attribution
 
-Diese Erweiterungen helfen dabei, Fehler frühzeitig zu erkennen, regulatorische und technische Risiken zu reduzieren und elektronische Rechnungen langfristig stabil zu verarbeiten.
+Licensed under the [Apache License 2.0](LICENSE.txt).
 
-Weitere Informationen:
-
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
-
-
-### Dank an die Community
-
-Ein großes Dankeschön an alle Contributors und Nutzer, die dieses Projekt seit 2013 begleitet haben.
-
-Eure Beiträge, Bugreports und Ideen sind ein wesentlicher Bestandteil dieses Erfolgs.
-
-
-## English
-
-### A New Chapter for ZUGFeRD-CSharp
-
-ZUGFeRD-CSharp started in 2013 as a hobby project, aiming to simplify the creation and processing of ZUGFeRD invoices.
-
-Today, hundreds of companies rely on this library in production.
-
-With this adoption comes responsibility: ensuring the long-term stability and reliability of the library is essential.
-
-Active product development will therefore continue through **FactoorSharp**, the commercial successor to ZUGFeRD-CSharp.
-
-For new projects, upcoming standards, and long-term production use, we recommend:
-
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
-
-### FactoorSharp – The Commercial Successor
-
-Active commercial development continues through **FactoorSharp**.
-
-  - New features
-  - Enhanced functionality
-  - Support for current and future standards
-  - Professional validation and visualization
-  - Professional support
-
-### Website
-
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
-
-### NuGet
-
-https://www.nuget.org/packages/FactoorSharp.FacturX
-
-### GitHub – Issues and Discussions
-
-https://github.com/S2-Industries/FactoorSharp.FacturX
-
-
-### Why Choose FactoorSharp?
-
-FactoorSharp provides additional capabilities beyond the basic processing of ZUGFeRD files and is designed specifically for production-grade environments:
-
-- **Validation component**  
-  Validate ZUGFeRD, Factur-X, and PDF documents using established tools such as Mustang, Valitool, and VeraPDF
-
-- **Visualization component**  
-  Create well-designed PDF representations based on electronic invoice data
-
-- **Integration of upcoming standards**  
-  Early support for new regulatory requirements and evolving e-invoicing standards
-
-- **Online tools and services**  
-  Additional utilities for analyzing, validating, and processing electronic invoices
-
-- **Professional support**  
-  Assistance with production use, technical questions, and integration
-
-These capabilities help improve quality, compliance, and efficiency while reducing risks when processing electronic invoices.
-
-Learn more:
-
-[https://www.factoorsharp.de](https://www.factoorsharp.de/?utm_source=github&utm_medium=readme&utm_campaign=zugferd-csharp)
-
-### Thanks to the Community
-
-A big thank-you to all contributors and users who have supported this project since 2013.
-
-Your contributions, bug reports, and ideas have been an essential part of its success.
-
-
-
-
-
-
-# Documentation
-
-The full documentation for the open-source version can be found here:
-
-https://github.com/stephanstapel/ZUGFeRD-csharp/tree/master/docs
+Envisia.InvoiceXml is a derivative of [ZUGFeRD-csharp](https://github.com/stephanstapel/ZUGFeRD-csharp)
+by Stephan Stapel / STwo Industries GmbH and its contributors. See [NOTICE](NOTICE).

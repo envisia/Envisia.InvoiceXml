@@ -46,22 +46,12 @@ namespace Envisia.InvoiceXml
                 throw new IllegalStreamException("Cannot read from stream");
             }
 
-            byte[] firstPartOfDocumentBuffer = new byte[1024];
-            stream.Read(firstPartOfDocumentBuffer, 0, 1024);
-            stream.Position = 0;
-            string firstPartOfDocument = System.Text.Encoding.UTF8.GetString(firstPartOfDocumentBuffer);
-            bool isInvoice = true;
-
             XmlDocument doc = new XmlDocument();
             doc.Load(stream);
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.DocumentElement.OwnerDocument.NameTable);
 
-            if ((firstPartOfDocument.IndexOf("<CreditNote", StringComparison.OrdinalIgnoreCase) > -1) ||
-                (firstPartOfDocument.IndexOf("<ubl:CreditNote", StringComparison.OrdinalIgnoreCase) > -1) ||
-                (firstPartOfDocument.IndexOf("<ns0:CreditNote", StringComparison.OrdinalIgnoreCase) > -1))
-            {
-                isInvoice = false;
-            }
+            // decide by the root element instead of scanning the beginning of the document for a certain prefix
+            bool isInvoice = !String.Equals(doc.DocumentElement.LocalName, "CreditNote", StringComparison.Ordinal);
 
             if (isInvoice)
             {
