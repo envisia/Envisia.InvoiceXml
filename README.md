@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/envisia/ZUGFeRD-csharp/actions/workflows/ci.yml/badge.svg)](https://github.com/envisia/ZUGFeRD-csharp/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Envisia.InvoiceXml?logo=nuget)](https://www.nuget.org/packages/Envisia.InvoiceXml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE.txt)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 A .NET library to **create and read structured electronic invoices according to EN 16931** –
 ZUGFeRD, Factur-X and XRechnung – in both EN 16931 syntaxes, UN/CEFACT **CII** and OASIS **UBL**.
@@ -136,7 +136,7 @@ Releases are published to nuget.org by pushing a version tag (`v1.2.3`); see
 
 ## License and attribution
 
-Licensed under the [Apache License 2.0](LICENSE.txt).
+Licensed under the [Apache License 2.0](LICENSE).
 
 Envisia.InvoiceXml is a derivative of [ZUGFeRD-csharp](https://github.com/stephanstapel/ZUGFeRD-csharp)
 by Stephan Stapel / STwo Industries GmbH and its contributors. See [NOTICE](NOTICE).
