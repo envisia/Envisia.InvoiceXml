@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
+    <AssemblyName>Envisia.InvoiceXml</AssemblyName>
+    <RootNamespace>Envisia.InvoiceXml</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
+
+    <!-- NuGet package -->
+    <IsPackable>true</IsPackable>
+    <PackageId>Envisia.InvoiceXml</PackageId>
+    <Title>Envisia.InvoiceXml – EN 16931 e-invoice XML (ZUGFeRD, Factur-X, XRechnung)</Title>
+    <Description>Read and write structured electronic invoices according to EN 16931: ZUGFeRD 1.0/2.x, Factur-X (MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED) and XRechnung in both UN/CEFACT CII and OASIS UBL syntax. The library produces and parses the invoice XML; embedding it into a PDF/A-3 is left to the PDF library of your choice.</Description>
+    <PackageTags>en16931;e-invoice;einvoice;e-rechnung;zugferd;factur-x;facturx;xrechnung;cii;ubl;invoice;xml</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/envisia/ZUGFeRD-csharp/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" />
+    <None Include="..\..\NOTICE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
