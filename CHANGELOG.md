@@ -37,6 +37,24 @@ First release of **Envisia.InvoiceXml**, based on ZUGFeRD-csharp 18.0.0
 
 ### Added
 
+- `ZUGFeRDVersion.Version25` for ZUGFeRD 2.5 / Factur-X 1.09 (2.5.2 / 1.09.2). It uses the same guideline identifiers
+  as `Version23` and additionally writes the EXTENDED elements introduced with Factur-X 1.09:
+  - debtor BIC (`PayerSpecifiedDebtorFinancialInstitution`) and debtor account name,
+  - manufacturer of an item (`TradeLineItem.Manufacturer`),
+  - financial adjustments (`InvoiceDescriptor.AddFinancialAdjustment()`, BR-FXEXT-CO-16 in `InvoiceValidator`).
+- EXTENDED elements of ZUGFeRD 2.4 / Factur-X 1.08 (written when set):
+  - per-package unit quantity (`TradeLineItem.SetPerPackageUnitQuantity()`, BT-X-561),
+  - delivery location of the delivery terms (`InvoiceDescriptor.SetApplicableTradeDeliveryTerms()`, BG-X-88),
+  - line level delivery terms (`TradeLineItem.SetApplicableTradeDeliveryTerms()`, BG-X-87),
+  - item seller (`TradeLineItem.ItemSeller`, BG-X-90),
+  - line totals `ChargeTotalAmount`, `AllowanceTotalAmount`, `TaxTotalAmount`, `TaxTotalAmountInAccountingCurrency`,
+    `GrandTotalAmount` on `TradeLineItem`,
+  - type code (BT-X-11) and measured value (BT-X-12) of item attributes.
+- Code lists updated to the EN 16931 code lists v16/v17 (as used by Factur-X 1.09.2 and XRechnung 3.0.2):
+  EAS 0242, 0244–0246, 0248; ICD 0241–0248; VATEX-EU-135-1; currencies CNH and XCG (ANG and BGN are
+  documented as withdrawn); invoice type 935; the complete UNTDID 1153 and 4451 lists (e.g. AXU); unit H16.
+- UBL: value added tax point date code (BT-8) as `cac:InvoicePeriod/cbc:DescriptionCode`.
+- All line level receivable accounting accounts are read (previously only the first).
 - Conformance tests against the official XSDs of Factur-X 1.08 (ZUGFeRD 2.4) and Factur-X 1.09.2
   (ZUGFeRD 2.5.2) for every profile, round trips of all official ZUGFeRD 2.4 examples and XSD
   validation of XRechnung UBL output (OASIS UBL 2.1). The 1.09.2 and UBL 2.1 schemas are part of
@@ -54,6 +72,12 @@ First release of **Envisia.InvoiceXml**, based on ZUGFeRD-csharp 18.0.0
   as invalid codes.
 - XRechnung payment terms no longer produce an empty `Description` element.
 - UBL credit notes are detected by their root element.
+- UBL: every UNTDID 1001 invoice type can be written (credit notes according to the EN 16931 interpretation as
+  `ubl:CreditNote`); previously many valid codes threw `NotImplementedException`.
+- UBL: the seller tax representative (BG-11) name is written and read as `cac:PartyName` (BT-62) and its VAT
+  identifier (BT-63) is written and read; empty address elements and tax registrations without number are no
+  longer written.
+- CII: `ReferenceTypeCode` of referenced documents is written in schema order (after name and attachment).
 - Test input files are opened read-only, so tests for several target frameworks can run in parallel.
 
 ### Removed

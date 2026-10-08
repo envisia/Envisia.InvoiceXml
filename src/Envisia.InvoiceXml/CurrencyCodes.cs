@@ -23,6 +23,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Currency codes according to ISO 4217 (BT-5, BT-6).
+    /// </summary>
     public enum CurrencyCodes
     {
         /// <summary>

@@ -32,6 +32,12 @@ namespace Envisia.InvoiceXml
     /// </summary>
     public class InvoiceValidator
     {
+        /// <summary>
+        /// Validates the invoice and writes the protocol to the console and, optionally, to a file.
+        /// </summary>
+        /// <param name="descriptor">Invoice to validate</param>
+        /// <param name="version">Version the invoice will be written in</param>
+        /// <param name="filename">Optional file for the protocol</param>
         public static void ValidateAndPrint(InvoiceDescriptor descriptor, ZUGFeRDVersion version, string filename = null)
         {
             ValidationResult validationResult = Validate(descriptor, version);
@@ -47,6 +53,13 @@ namespace Envisia.InvoiceXml
             }
         } // !ValidateAndPrint()
 
+        /// <summary>
+        /// Recalculates line totals, allowances and charges, the VAT breakdown and the document totals of the invoice and
+        /// checks them against the declared amounts (BR-CO-*, BR-DEC-*).
+        /// </summary>
+        /// <param name="descriptor">Invoice to validate</param>
+        /// <param name="version">Version the invoice will be written in</param>
+        /// <returns>The result including a protocol of the recalculation</returns>
         public static ValidationResult Validate(InvoiceDescriptor descriptor, ZUGFeRDVersion version)
         {
             ValidationResult retval = new ValidationResult()
@@ -187,8 +200,10 @@ namespace Envisia.InvoiceXml
             decimal rounding = descriptor.RoundingAmount.GetValueOrDefault();
 
             // Financial adjustments (SpecifiedFinancialAdjustment) only exist in the EXTENDED profile of Factur-X 1.09 / ZUGFeRD 2.5,
-            // the writer omits them in all other profiles.
-            decimal financialAdjustments = descriptor.GetFinancialAdjustments()?.Where(adjustment => adjustment != null).Sum(adjustment => adjustment.ActualAmount) ?? 0m;
+            // the writer omits them for older versions and all other profiles.
+            decimal financialAdjustments = version >= ZUGFeRDVersion.Version25
+                ? descriptor.GetFinancialAdjustments()?.Where(adjustment => adjustment != null).Sum(adjustment => adjustment.ActualAmount) ?? 0m
+                : 0m;
 
             // BR-CO-16: BT-115 equals BT-112 minus BT-113 plus BT-114.
             // BR-FXEXT-CO-16 (EXTENDED): additionally plus the sum of the financial adjustment amounts.

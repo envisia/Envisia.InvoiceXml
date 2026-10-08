@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+using System.Text;
 using System.Xml;
 
 namespace Envisia.InvoiceXml.Tests
@@ -500,7 +501,7 @@ namespace Envisia.InvoiceXml.Tests
             desc.AddFinancialAdjustment(5m, "");
 
             using MemoryStream ms = new MemoryStream();
-            Assert.ThrowsExactly<MissingDataException>(() => desc.Save(ms, ZUGFeRDVersion.Version23, Profile.Extended));
+            Assert.ThrowsExactly<MissingDataException>(() => desc.Save(ms, ZUGFeRDVersion.Version25, Profile.Extended));
         } // !TestFinancialAdjustmentWithoutReasonIsRejected()
 
 
@@ -512,17 +513,17 @@ namespace Envisia.InvoiceXml.Tests
         {
             InvoiceDescriptor desc = _CreateInvoiceWithFinancialAdjustments();
 
-            ValidationResult result = InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version23);
+            ValidationResult result = InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version25);
             Assert.IsTrue(result.IsValid, string.Join(Environment.NewLine, result.Messages));
 
             // the invoice also validates after a round trip
             byte[] xml = _SaveAndValidate(desc, Profile.Extended, SchemaValidator.FacturX1092);
-            ValidationResult loadedResult = InvoiceValidator.Validate(_Load(xml), ZUGFeRDVersion.Version23);
+            ValidationResult loadedResult = InvoiceValidator.Validate(_Load(xml), ZUGFeRDVersion.Version25);
             Assert.IsTrue(loadedResult.IsValid, string.Join(Environment.NewLine, loadedResult.Messages));
 
             // a due payable amount that ignores the adjustments violates BR-FXEXT-CO-16
             desc.DuePayableAmount = 529.87m;
-            ValidationResult invalidResult = InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version23);
+            ValidationResult invalidResult = InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version25);
             Assert.IsFalse(invalidResult.IsValid);
             Assert.IsTrue(invalidResult.Messages.Any(m => m.Contains("duePayable") && m.Contains("537.37")), string.Join(Environment.NewLine, invalidResult.Messages));
         } // !TestValidatorAddsFinancialAdjustmentsToDuePayableAmount()
@@ -625,6 +626,40 @@ namespace Envisia.InvoiceXml.Tests
 
 
         /// <summary>
+        /// ZUGFeRD 2.4 (Version23) does not know the elements that were added with Factur-X 1.09: they are not written,
+        /// so existing invoices with a debtor BIC stay valid for receivers that validate against ZUGFeRD 2.4.
+        /// </summary>
+        [TestMethod]
+        public void TestFacturX109ElementsAreOnlyWrittenForZUGFeRD25()
+        {
+            InvoiceDescriptor desc = _CreateInvoiceWithFinancialAdjustments();
+            desc.CreditorBankAccounts.Clear();
+            desc.SetPaymentMeansSepaDirectDebit("DE98ZZZ09999999999", "MANDAT-0815", "Lastschrift");
+            desc.AddDebitorFinancialAccount(iban: "DE21860000000086001055", bic: "MARKDEF1860", name: "Kunden AG Mitte");
+            desc.TradeLineItems[0].Manufacturer = new Party() { Name = "Papierfabrik AG", Country = CountryCodes.DE };
+            string[] facturX109Elements = { "PayerSpecifiedDebtorFinancialInstitution", "ManufacturerTradeParty", "SpecifiedFinancialAdjustment", "AccountName>Kunden AG Mitte" };
+
+            string zugferd24 = Encoding.UTF8.GetString(_SaveAndValidate(desc, Profile.Extended, SchemaValidator.FacturX108, SchemaValidator.FacturX1092));
+            foreach (string element in facturX109Elements)
+            {
+                Assert.DoesNotContain(element, zugferd24);
+            }
+            StringAssert.Contains(zugferd24, "<ram:IBANID>DE21860000000086001055</ram:IBANID>");
+
+            string zugferd25 = Encoding.UTF8.GetString(_SaveAndValidate(desc, Profile.Extended, SchemaValidator.FacturX1092));
+            foreach (string element in facturX109Elements)
+            {
+                StringAssert.Contains(zugferd25, element);
+            }
+
+            // the validator only adds the adjustments to BT-115 for ZUGFeRD 2.5, where they are written
+            desc.DuePayableAmount = desc.GrandTotalAmount;
+            Assert.IsTrue(InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version23).IsValid);
+            Assert.IsFalse(InvoiceValidator.Validate(desc, ZUGFeRDVersion.Version25).IsValid);
+        } // !TestFacturX109ElementsAreOnlyWrittenForZUGFeRD25()
+
+
+        /// <summary>
         /// Invoice from InvoiceProvider with two financial adjustments (+10.00, -2.50) that are included in BT-115.
         /// </summary>
         private InvoiceDescriptor _CreateInvoiceWithFinancialAdjustments()
@@ -639,11 +674,14 @@ namespace Envisia.InvoiceXml.Tests
 
         /// <summary>
         /// Saves the invoice in the given profile and validates the result against the Factur-X schemas of the given versions.
+        /// Invoices that have to be valid against Factur-X 1.08 are written as ZUGFeRD 2.4 (Version23), invoices that are only
+        /// validated against Factur-X 1.09.2 as ZUGFeRD 2.5 (Version25), which also writes the elements added with 1.09.
         /// </summary>
         private static byte[] _SaveAndValidate(InvoiceDescriptor desc, Profile profile, params string[] schemaVersions)
         {
+            ZUGFeRDVersion version = schemaVersions.Contains(SchemaValidator.FacturX108) ? ZUGFeRDVersion.Version23 : ZUGFeRDVersion.Version25;
             using MemoryStream ms = new MemoryStream();
-            desc.Save(ms, ZUGFeRDVersion.Version23, profile);
+            desc.Save(ms, version, profile);
 
             foreach (string schemaVersion in schemaVersions)
             {

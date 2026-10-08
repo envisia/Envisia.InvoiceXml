@@ -24,6 +24,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Country codes according to ISO 3166-1 alpha-2 (e.g. BT-40, BT-55, BT-80).
+    /// </summary>
     public enum CountryCodes
     {
         /// <summary>

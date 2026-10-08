@@ -29,6 +29,15 @@ namespace Envisia.InvoiceXml
 {
     internal class InvoiceDescriptor23Writer : IInvoiceDescriptorWriter
     {
+        private readonly ZUGFeRDVersion _Version;
+
+
+        internal InvoiceDescriptor23Writer(ZUGFeRDVersion version = ZUGFeRDVersion.Version23)
+        {
+            _Version = version;
+        } // !InvoiceDescriptor23Writer()
+
+
         // Is currently unused, therefore commented out.
         //private readonly Profile ALL_PROFILES = Profile.Minimum | Profile.BasicWL | Profile.Basic | Profile.Comfort | Profile.Extended | Profile.XRechnung1 | Profile.XRechnung;
 
@@ -47,7 +56,7 @@ namespace Envisia.InvoiceXml
 
             if (format == ZUGFeRDFormats.CII)
             {
-                writer = new InvoiceDescriptor23CIIWriter();
+                writer = new InvoiceDescriptor23CIIWriter(_Version);
             }
             else if ((format == ZUGFeRDFormats.UBL) && (descriptor.Profile == Profile.XRechnung))
             {

@@ -234,12 +234,16 @@ This information needs to be sent to the tax authorities. Different due dates ap
 |---|---|---|---|
 | `Version1` | 1.0 | – | CII D13B, profiles BASIC, COMFORT, EXTENDED |
 | `Version20` | 2.0 | – | CII D16B |
-| `Version23` | 2.1, 2.1.1, 2.2, 2.3, 2.4, 2.5, 2.5.2 | 1.0 – 1.09.2 | CII D22B; the guideline identifiers (BT-24) are identical for all these versions |
+| `Version23` | 2.1, 2.1.1, 2.2, 2.3, 2.4 | 1.0 – 1.08 | CII D22B |
+| `Version25` | 2.5, 2.5.2 | 1.09 – 1.09.2 | CII D22B, adds the EXTENDED elements introduced with Factur-X 1.09 |
 
-ZUGFeRD 2.4 (Factur-X 1.08) and ZUGFeRD 2.5 (Factur-X 1.09) only added optional elements, almost exclusively to the
-EXTENDED profile (for example sub invoice lines, item seller, financial adjustments). These elements are written when
-they are set, so invoices that do not use them stay valid against all ZUGFeRD 2.3+ schemas. The writer is tested
-against the official XSDs of Factur-X 1.08 and 1.09.2 for every profile.
+The guideline identifiers (BT-24) are identical for all ZUGFeRD 2.1+ versions, so `Version23` and `Version25` only
+differ in the EXTENDED elements that were introduced with Factur-X 1.09 (debtor BIC and account name, manufacturer of an
+item, financial adjustments): they are only written with `Version25`, so invoices written with `Version23` stay valid
+for receivers that validate against ZUGFeRD 2.4. Other optional elements that were added in ZUGFeRD 2.4 / 2.5 (for
+example sub invoice lines or the item seller) are written when they are set. The writer is tested against the official
+XSDs of Factur-X 1.08 and 1.09.2 for every profile. When reading, `InvoiceDescriptor.GetVersion()` reports `Version23`
+for all ZUGFeRD 2.1+ invoices.
 
 
 

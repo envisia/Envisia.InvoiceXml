@@ -581,12 +581,18 @@ namespace Envisia.InvoiceXml
         } // !GetTradeAllowanceCharges()
 
 
+        /// <summary>
+        /// Returns the allowances of the line (BG-27 and gross price allowances).
+        /// </summary>
         public IList<TradeAllowance> GetTradeAllowances()
         {
             return this.TradeAllowanceCharges.Where(s => s is TradeAllowance).Select(s => s as TradeAllowance).ToList();
         } // !GetTradeAllowances()
 
 
+        /// <summary>
+        /// Returns the charges of the line (BG-28 and gross price charges).
+        /// </summary>
         public IList<TradeCharge> GetTradeCharges()
         {
             return this.TradeAllowanceCharges.Where(s => s is TradeCharge).Select(s => s as TradeCharge).ToList();
@@ -913,6 +919,9 @@ namespace Envisia.InvoiceXml
         } // !AddDesignatedProductClassification()
 
 
+        /// <summary>
+        /// Returns true if the item has classifications (BT-158).
+        /// </summary>
         public bool AnyDesignatedProductClassifications()
         {
             return this.DesignatedProductClassifications.Any();
@@ -1038,6 +1047,12 @@ namespace Envisia.InvoiceXml
         } // !GetItemSellerTaxRegistration()
 
 
+        /// <summary>
+        /// Sets the invoice line period (BG-26).
+        /// </summary>
+        /// <param name="billingPeriodStart">Invoice line period start date (BT-134)</param>
+        /// <param name="billingPeriodEnd">Invoice line period end date (BT-135)</param>
+        /// <returns>The line, to allow chaining</returns>
         public TradeLineItem SetBillingPeriod(DateTime? billingPeriodStart, DateTime? billingPeriodEnd)
         {
             this.BillingPeriodStart = billingPeriodStart;

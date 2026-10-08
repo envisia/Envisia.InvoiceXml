@@ -199,8 +199,10 @@ using (FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.
 }
 ```
 
-`ZUGFeRDVersion.Version23` covers ZUGFeRD 2.1 up to 2.5.2 (Factur-X 1.0 up to 1.09.2): the guideline identifiers did
-not change between these versions. XRechnung is written as XRechnung 3.0 (valid for 3.0.x, currently 3.0.2).
+`ZUGFeRDVersion.Version23` writes ZUGFeRD 2.1 – 2.4 (Factur-X 1.0 – 1.08) invoices, `ZUGFeRDVersion.Version25` ZUGFeRD 2.5
+(Factur-X 1.09) invoices, which may contain the EXTENDED elements that were introduced with 2.5. The guideline identifiers
+did not change between these versions (see [profiles and formats](profiles-and-formats.md)). XRechnung is written as
+XRechnung 3.0 (valid for 3.0.x, currently 3.0.2).
 
 
 

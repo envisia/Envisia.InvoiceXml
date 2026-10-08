@@ -25,6 +25,9 @@ using System.Text;
 //
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Identification schemes according to ISO/IEC 6523 (ICD code list), used for global identifiers of parties and items.
+    /// </summary>
     public enum GlobalIDSchemeIdentifiers
     {
         /// <summary>

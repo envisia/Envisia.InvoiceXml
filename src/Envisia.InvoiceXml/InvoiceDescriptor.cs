@@ -1635,7 +1635,8 @@ namespace Envisia.InvoiceXml
                 case ZUGFeRDVersion.Version20:
                     return new InvoiceDescriptor20Writer();
                 case ZUGFeRDVersion.Version23:
-                    return new InvoiceDescriptor23Writer();
+                case ZUGFeRDVersion.Version25:
+                    return new InvoiceDescriptor23Writer(version);
                 default:
                     throw new UnsupportedException("New ZUGFeRDVersion '" + version + "' defined but not implemented!");
             }
@@ -2007,6 +2008,12 @@ namespace Envisia.InvoiceXml
         } // !AnyTradeLineItems()
 
 
+        /// <summary>
+        /// Sets the invoicing period (BG-14).
+        /// </summary>
+        /// <param name="billingPeriodStart">Invoicing period start date (BT-73)</param>
+        /// <param name="billingPeriodEnd">Invoicing period end date (BT-74)</param>
+        /// <returns>The invoice, to allow chaining</returns>
         public InvoiceDescriptor SetBillingPeriod(DateTime? billingPeriodStart, DateTime? billingPeriodEnd)
         {
             this.BillingPeriodStart = billingPeriodStart;
@@ -2239,6 +2246,9 @@ namespace Envisia.InvoiceXml
         } // !GetLogisticsServiceCharges()
 
 
+        /// <summary>
+        /// Returns the additional supporting documents (BG-24) and the invoiced object identifier (BT-18).
+        /// </summary>
         public List<AdditionalReferencedDocument> GetAdditionalReferencedDocuments()
         {
             return this.AdditionalReferencedDocuments;

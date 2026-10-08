@@ -101,9 +101,17 @@ namespace Envisia.InvoiceXml.Tests
             using MemoryStream ms = new MemoryStream();
             desc.Save(ms, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL);
 
-            bool isCreditNote = Encoding.UTF8.GetString(ms.ToArray()).Contains("<ubl:CreditNote");
+            string xml = Encoding.UTF8.GetString(ms.ToArray());
+            bool isCreditNote = xml.Contains("<ubl:CreditNote");
             List<string> errors = SchemaValidator.Validate(ms, SchemaValidator.GetUblSchemaPath(isCreditNote));
             Assert.IsEmpty(errors, string.Join(Environment.NewLine, errors));
+
+            // PEPPOL-EN16931-R008: no empty elements
+            List<string> emptyElements = System.Xml.Linq.XDocument.Parse(xml).Descendants()
+                .Where(e => !e.HasElements && !e.HasAttributes && String.IsNullOrWhiteSpace(e.Value))
+                .Select(e => e.Name.LocalName)
+                .ToList();
+            Assert.IsEmpty(emptyElements, "Empty elements: " + string.Join(", ", emptyElements));
         } // !TestUblDemoInvoiceRoundTripIsSchemaValid()
 
 
@@ -144,6 +152,44 @@ namespace Envisia.InvoiceXml.Tests
             Assert.AreEqual("Ship to line 2", loaded.ShipTo.Street2);
             Assert.AreEqual("Ship to line 3", loaded.ShipTo.AddressLine3);
         } // !TestUblAddressLinesRoundTrip()
+
+
+        /// <summary>
+        /// BG-11 in UBL: name (BT-62) as cac:PartyName, VAT identifier (BT-63) as cac:PartyTaxScheme, no empty address elements.
+        /// </summary>
+        [TestMethod]
+        [DataRow(ZUGFeRDFormats.UBL)]
+        [DataRow(ZUGFeRDFormats.CII)]
+        public void TestSellerTaxRepresentativeRoundTrip(ZUGFeRDFormats format)
+        {
+            InvoiceDescriptor desc = _InvoiceProvider.CreateInvoice();
+            desc.SellerTaxRepresentative = new Party() { Name = "Steuervertreter GmbH", Country = CountryCodes.DE };
+            desc.AddSellerTaxRepresentativeTaxRegistration("DE124567890", TaxRegistrationSchemeID.VA);
+
+            using MemoryStream ms = new MemoryStream();
+            desc.Save(ms, ZUGFeRDVersion.Version23, Profile.XRechnung, format);
+            string xml = Encoding.UTF8.GetString(ms.ToArray());
+            if (format == ZUGFeRDFormats.UBL)
+            {
+                List<string> errors = SchemaValidator.Validate(ms, SchemaValidator.GetUblSchemaPath(false));
+                Assert.IsEmpty(errors, string.Join(Environment.NewLine, errors));
+                System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+                doc.LoadXml(xml);
+                System.Xml.XmlNamespaceManager nsmgr = new System.Xml.XmlNamespaceManager(doc.NameTable);
+                nsmgr.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+                nsmgr.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+                Assert.AreEqual("Steuervertreter GmbH", doc.SelectSingleNode("//cac:TaxRepresentativeParty/cac:PartyName/cbc:Name", nsmgr)?.InnerText);
+                Assert.AreEqual("DE124567890", doc.SelectSingleNode("//cac:TaxRepresentativeParty/cac:PartyTaxScheme/cbc:CompanyID", nsmgr)?.InnerText);
+                Assert.DoesNotContain("<cbc:CityName />", xml);
+                Assert.DoesNotContain("<cbc:PostalZone />", xml);
+            }
+
+            InvoiceDescriptor loaded = InvoiceDescriptor.Load(ms);
+            Assert.AreEqual("Steuervertreter GmbH", loaded.SellerTaxRepresentative.Name);
+            Assert.AreEqual(CountryCodes.DE, loaded.SellerTaxRepresentative.Country);
+            Assert.AreEqual("DE124567890", loaded.GetSellerTaxRepresentativeTaxRegistration().Single().No);
+            Assert.AreEqual(TaxRegistrationSchemeID.VA, loaded.GetSellerTaxRepresentativeTaxRegistration().Single().SchemeID);
+        } // !TestSellerTaxRepresentativeRoundTrip()
 
 
         /// <summary>

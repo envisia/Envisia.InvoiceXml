@@ -188,7 +188,18 @@ namespace Envisia.InvoiceXml
                 };
             }
             
+            // BG-11: the name of the tax representative (BT-62) is cac:PartyName/cbc:Name, its VAT identifier (BT-63) cac:PartyTaxScheme
             retval.SellerTaxRepresentative = _nodeAsParty(doc.DocumentElement, "//cac:TaxRepresentativeParty", nsmgr);
+            if ((retval.SellerTaxRepresentative != null) && String.IsNullOrWhiteSpace(retval.SellerTaxRepresentative.Name))
+            {
+                retval.SellerTaxRepresentative.Name = XmlUtils.NodeAsString(doc.DocumentElement, "//cac:TaxRepresentativeParty/cac:PartyName/cbc:Name", nsmgr);
+            }
+            foreach (XmlNode node in doc.SelectNodes("//cac:TaxRepresentativeParty/cac:PartyTaxScheme", nsmgr))
+            {
+                string id = XmlUtils.NodeAsString(node, ".//cbc:CompanyID", nsmgr);
+                TaxRegistrationSchemeID schemeID = UBLTaxRegistrationSchemeIDMapper.Map(XmlUtils.NodeAsString(node, ".//cac:TaxScheme/cbc:ID", nsmgr));
+                retval.AddSellerTaxRepresentativeTaxRegistration(id, schemeID);
+            }
 
             //Get all referenced and embedded documents (BG-24)
             // TODO //XmlNodeList referencedDocNodes = doc.SelectNodes(".//ram:ApplicableHeaderTradeAgreement/ram:AdditionalReferencedDocument", nsmgr);

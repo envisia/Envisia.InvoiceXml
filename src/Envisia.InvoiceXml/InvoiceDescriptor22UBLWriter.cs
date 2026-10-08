@@ -301,7 +301,7 @@ namespace Envisia.InvoiceXml
 
             if (this._Descriptor.SellerTaxRepresentative != null)
             {
-                _writeOptionalParty(_Writer, PartyTypes.SellerTaxRepresentativeTradeParty, this._Descriptor.SellerTaxRepresentative);
+                _writeOptionalParty(_Writer, PartyTypes.SellerTaxRepresentativeTradeParty, this._Descriptor.SellerTaxRepresentative, taxRegistrations: this._Descriptor.SellerTaxRepresentativeTaxRegistration);
             }
 
             // Delivery = ShipToTradeParty
@@ -1086,20 +1086,23 @@ namespace Envisia.InvoiceXml
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(party.SpecifiedLegalOrganization?.TradingBusinessName))
+                // the name of the tax representative (BT-62) is its party name, other parties use it for the trading name (BT-28, BT-45)
+                string partyName = (partyType == PartyTypes.SellerTaxRepresentativeTradeParty) ? party.Name : party.SpecifiedLegalOrganization?.TradingBusinessName;
+                if (!string.IsNullOrWhiteSpace(partyName))
                 {
                     writer.WriteStartElement("cac", "PartyName");
                     writer.WriteStartElement("cbc", "Name");
-                    writer.WriteValue(party.SpecifiedLegalOrganization.TradingBusinessName);
+                    writer.WriteValue(partyName);
                     writer.WriteEndElement();//!Name
                     writer.WriteEndElement();//!PartyName
                 }
 
+                // empty elements are not allowed (PEPPOL-EN16931-R008)
                 writer.WriteStartElement("cac", "PostalAddress");
                 _Writer.WriteOptionalElementString("cbc", "StreetName", party.Street);
                 _Writer.WriteOptionalElementString("cbc", "AdditionalStreetName", party.Street2);
-                _Writer.WriteElementString("cbc", "CityName", party.City);
-                _Writer.WriteElementString("cbc", "PostalZone", party.Postcode);
+                _Writer.WriteOptionalElementString("cbc", "CityName", party.City);
+                _Writer.WriteOptionalElementString("cbc", "PostalZone", party.Postcode);
                 _Writer.WriteOptionalElementString("cbc", "CountrySubentity", party.CountrySubdivisionName);
                 // UBL schema order: AddressLine (BT-163) follows CountrySubentity and precedes Country
                 if (!string.IsNullOrWhiteSpace(party.AddressLine3))
@@ -1121,7 +1124,7 @@ namespace Envisia.InvoiceXml
 
                 if (taxRegistrations != null)
                 {
-                    foreach (var tax in taxRegistrations)
+                    foreach (var tax in taxRegistrations.Where(tr => !String.IsNullOrWhiteSpace(tr.No)))
                     {
                         _Writer.WriteStartElement("cac", "PartyTaxScheme");
                         _Writer.WriteElementString("cbc", "CompanyID", tax.No);
@@ -1132,7 +1135,9 @@ namespace Envisia.InvoiceXml
                     }
                 }
                 
-                if ((party.SpecifiedLegalOrganization != null) || !String.IsNullOrWhiteSpace(party.Description) || !String.IsNullOrWhiteSpace(party.Name))
+                // BG-11 (tax representative) has no legal entity
+                if ((partyType != PartyTypes.SellerTaxRepresentativeTradeParty) &&
+                    ((party.SpecifiedLegalOrganization != null) || !String.IsNullOrWhiteSpace(party.Description) || !String.IsNullOrWhiteSpace(party.Name)))
                 {
                     writer.WriteStartElement("cac", "PartyLegalEntity");
 

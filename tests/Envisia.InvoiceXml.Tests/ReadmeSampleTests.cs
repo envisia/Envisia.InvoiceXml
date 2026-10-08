@@ -31,6 +31,7 @@ namespace Envisia.InvoiceXml.Tests
             InvoiceDescriptor invoice = InvoiceDescriptor.CreateInvoice("471102", new DateTime(2026, 3, 5), CurrencyCodes.EUR);
             invoice.BusinessProcess = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
             invoice.ReferenceOrderNo = "04011000-12345-34";                       // BT-10 buyer reference (Leitweg-ID)
+            invoice.ActualDeliveryDate = new DateTime(2026, 3, 3);                // BT-72
 
             invoice.SetSeller("Lieferant GmbH", "80333", "München", "Lieferantenstraße 20", CountryCodes.DE);
             invoice.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);

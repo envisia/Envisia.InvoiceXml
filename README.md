@@ -16,14 +16,23 @@ ZUGFeRD / Factur-X invoice) is intentionally left to the PDF library of your cho
 |---|---|---|---|---|---|
 | ZUGFeRD 1.0 | 1.0 | BASIC, COMFORT, EXTENDED | CII D13B | ✔ | ✔ |
 | ZUGFeRD 2.0 | 2.0 | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D16B | ✔ | ✔ |
-| ZUGFeRD 2.1 – **2.5.2** / Factur-X 1.0 – **1.09.2** | `ZUGFeRDVersion.Version23` | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D22B | ✔ | ✔ |
+| ZUGFeRD 2.1 – 2.4 / Factur-X 1.0 – 1.08 | `ZUGFeRDVersion.Version23` | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D22B | ✔ | ✔ |
+| ZUGFeRD 2.5 – **2.5.2** / Factur-X 1.09 – **1.09.2** | `ZUGFeRDVersion.Version25` | MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED | CII D22B | ✔ | ✔ |
 | XRechnung | 1.2 – **3.0.2** (writes 3.0.x) | XRechnung (CIUS) | CII and UBL 2.1 | ✔ | ✔ |
 | French e-reporting | | EREPORTING | CII | ✔ | ✔ |
 
-The guideline identifiers (BT-24) did not change between Factur-X 1.0 and 1.09.2, therefore
-`ZUGFeRDVersion.Version23` covers every ZUGFeRD version from 2.1 up to the current 2.5.2.
-Elements that were added to the EXTENDED profile in ZUGFeRD 2.4 and 2.5 are only written when
-you fill them.
+The guideline identifiers (BT-24) did not change between Factur-X 1.0 and 1.09.2, so both
+versions produce the same document identifiers:
+
+- `Version23` writes invoices that are valid against ZUGFeRD 2.4 / Factur-X 1.08 (and older 2.x
+  receivers as long as you don't use elements that were introduced in 2.4, such as sub invoice lines).
+- `Version25` additionally writes the EXTENDED elements that were introduced with ZUGFeRD 2.5 /
+  Factur-X 1.09: debtor BIC and account name, the manufacturer of an item and financial adjustments.
+  Use it when your receivers validate against ZUGFeRD 2.5.
+
+All other new EXTENDED elements (item seller, line delivery terms, delivery location, per-package
+quantity, line totals, typed item attributes, ...) are only written when you fill them.
+When reading, ZUGFeRD 2.x invoices cannot be told apart and are reported as `Version23`.
 
 The test suite validates the generated XML against the **official schemas of Factur-X 1.08
 (ZUGFeRD 2.4) and Factur-X 1.09.2 (ZUGFeRD 2.5.2)** for every profile, round-trips all official
@@ -45,6 +54,7 @@ using Envisia.InvoiceXml;
 InvoiceDescriptor invoice = InvoiceDescriptor.CreateInvoice("471102", new DateTime(2026, 3, 5), CurrencyCodes.EUR);
 invoice.BusinessProcess = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
 invoice.ReferenceOrderNo = "04011000-12345-34";                       // BT-10 buyer reference (Leitweg-ID)
+invoice.ActualDeliveryDate = new DateTime(2026, 3, 3);                // BT-72
 
 invoice.SetSeller("Lieferant GmbH", "80333", "München", "Lieferantenstraße 20", CountryCodes.DE);
 invoice.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);

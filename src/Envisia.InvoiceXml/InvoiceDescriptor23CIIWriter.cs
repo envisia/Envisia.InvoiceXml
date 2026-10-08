@@ -37,8 +37,15 @@ namespace Envisia.InvoiceXml
 
 
 
-        internal InvoiceDescriptor23CIIWriter()
+        /// <summary>
+        /// True if the elements that were added with Factur-X 1.09 / ZUGFeRD 2.5 may be written.
+        /// </summary>
+        private readonly bool _WriteFacturX109Elements;
+
+
+        internal InvoiceDescriptor23CIIWriter(ZUGFeRDVersion version = ZUGFeRDVersion.Version23)
         {
+            _WriteFacturX109Elements = version >= ZUGFeRDVersion.Version25;
             _Namespaces = new Dictionary<string, string>
             {
                 { "rsm", "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" },
@@ -227,9 +234,9 @@ namespace Envisia.InvoiceXml
                 {
                     foreach (var productCharacteristic in tradeLineItem.ApplicableProductCharacteristics)
                     {
-                        // EN 16931 requires the item attribute name (BT-160) and value (BT-161). An attribute that is
-                        // described by the EXTENDED code (BT-X-11) or measure (BT-X-12) only cannot be written in the other profiles.
-                        if ((descriptor.Profile != Profile.Extended) &&
+                        // EN 16931 and ZUGFeRD 2.4 EXTENDED require the item attribute name (BT-160) and value (BT-161). An attribute
+                        // that is described by the EXTENDED code (BT-X-11) or measure (BT-X-12) only needs ZUGFeRD 2.5 EXTENDED.
+                        if (!((descriptor.Profile == Profile.Extended) && _WriteFacturX109Elements) &&
                             (String.IsNullOrWhiteSpace(productCharacteristic.Description) || String.IsNullOrWhiteSpace(productCharacteristic.Value)))
                         {
                             continue;
@@ -289,7 +296,10 @@ namespace Envisia.InvoiceXml
 
                 // ManufacturerTradeParty, Detailinformationen zum Hersteller (Factur-X 1.09 / ZUGFeRD 2.5, Extended)
                 // order as required by the schema: after OriginTradeCountry, before IncludedReferencedProduct
-                _writeOptionalParty(_Writer, PartyTypes.ManufacturerTradeParty, tradeLineItem.Manufacturer, Profile.Extended);
+                if (_WriteFacturX109Elements)
+                {
+                    _writeOptionalParty(_Writer, PartyTypes.ManufacturerTradeParty, tradeLineItem.Manufacturer, Profile.Extended);
+                }
 
                 if ((descriptor.Profile == Profile.Extended) && (tradeLineItem.IncludedReferencedProducts?.Any() == true)) // BG-X-1
                 {
@@ -1076,12 +1086,15 @@ namespace Envisia.InvoiceXml
                     _Writer.WriteStartElement("ram", "PayerPartyDebtorFinancialAccount", ALL_PROFILES ^ Profile.Minimum);
                     _Writer.WriteElementString("ram", "IBANID", account.IBAN); // BT-91
                     // The debtor account name was added to EXTENDED with Factur-X 1.09 / ZUGFeRD 2.5,
-                    // the other profiles only know the IBAN of the debtor account.
-                    _Writer.WriteOptionalElementString("ram", "AccountName", account.Name, Profile.Extended);
+                    // the other profiles and ZUGFeRD 2.4 only know the IBAN of the debtor account.
+                    if (_WriteFacturX109Elements)
+                    {
+                        _Writer.WriteOptionalElementString("ram", "AccountName", account.Name, Profile.Extended);
+                    }
                     _Writer.WriteEndElement(); // !PayerPartyDebtorFinancialAccount
 
                     // The BIC of the debtor was added to EXTENDED with Factur-X 1.09 / ZUGFeRD 2.5 as well.
-                    if (!String.IsNullOrWhiteSpace(account.BIC))
+                    if (_WriteFacturX109Elements && !String.IsNullOrWhiteSpace(account.BIC))
                     {
                         _Writer.WriteStartElement("ram", "PayerSpecifiedDebtorFinancialInstitution", Profile.Extended);
                         _Writer.WriteElementString("ram", "BICID", account.BIC);
@@ -1377,6 +1390,11 @@ namespace Envisia.InvoiceXml
             //  The amounts are part of BT-115 according to BR-FXEXT-CO-16.
             foreach (FinancialAdjustment financialAdjustment in this._Descriptor.GetFinancialAdjustments())
             {
+                if (!_WriteFacturX109Elements)
+                {
+                    break;
+                }
+
                 _Writer.WriteStartElement("ram", "SpecifiedFinancialAdjustment", Profile.Extended);
                 _Writer.WriteElementString("ram", "Reason", financialAdjustment.Reason);
                 _Writer.WriteElementString("ram", "ActualAmount", _formatDecimal(financialAdjustment.ActualAmount)); // without currency
@@ -1532,7 +1550,7 @@ namespace Envisia.InvoiceXml
         /// </summary>
         private void _validateFinancialAdjustments()
         {
-            if (this._Descriptor.Profile != Profile.Extended || this._Descriptor.FinancialAdjustments == null)
+            if (this._Descriptor.Profile != Profile.Extended || !_WriteFacturX109Elements || this._Descriptor.FinancialAdjustments == null)
             {
                 return;
             }
