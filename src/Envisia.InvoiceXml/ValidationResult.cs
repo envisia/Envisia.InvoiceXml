@@ -22,9 +22,19 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Result of <see cref="InvoiceValidator.Validate(InvoiceDescriptor, ZUGFeRDVersion)"/>.
+    /// </summary>
     public class ValidationResult
     {
+        /// <summary>
+        /// True if no rule was violated
+        /// </summary>
         public bool IsValid { get; set; } = false;
+
+        /// <summary>
+        /// Protocol of the recalculation including the violated rules
+        /// </summary>
         public List<string> Messages { get; set; } = new List<string>();
     }
 }

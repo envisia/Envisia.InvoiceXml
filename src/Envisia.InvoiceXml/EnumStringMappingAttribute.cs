@@ -22,12 +22,27 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Maps an enum member to the code that is used for it in the invoice XML.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class EnumStringValueAttribute : Attribute
     {
+        /// <summary>
+        /// Code that is written for the enum member
+        /// </summary>
         public string Value { get; }
+
+        /// <summary>
+        /// Additional codes that are accepted for the enum member when reading (e.g. withdrawn or misspelled codes)
+        /// </summary>
         public string[] LegacyValues { get; }
 
+        /// <summary>
+        /// Creates the mapping for an enum member.
+        /// </summary>
+        /// <param name="value">Code that is written for the enum member</param>
+        /// <param name="legacyValues">Additional codes that are accepted when reading</param>
         public EnumStringValueAttribute(string value, params string[] legacyValues)
         {
             Value = value;

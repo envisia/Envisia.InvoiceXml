@@ -22,6 +22,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Constants for building invoice texts.
+    /// </summary>
     public class XmlConstants
     {
         /// <summary>

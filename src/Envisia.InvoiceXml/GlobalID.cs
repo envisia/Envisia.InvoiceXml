@@ -52,6 +52,9 @@ namespace Envisia.InvoiceXml
         public GlobalIDSchemeIdentifiers? SchemeID { get; set; }
 
 
+        /// <summary>
+        /// Creates an empty global identifier.
+        /// </summary>
         public GlobalID()
         {
             this.ID = String.Empty;
@@ -59,6 +62,11 @@ namespace Envisia.InvoiceXml
         } // !GlobalID()
 
 
+        /// <summary>
+        /// Creates a global identifier with the given scheme.
+        /// </summary>
+        /// <param name="schemeID">Identification scheme (ISO/IEC 6523 ICD)</param>
+        /// <param name="ID">Identifier</param>
         public GlobalID(GlobalIDSchemeIdentifiers? schemeID, string ID)
         {
             this.ID = ID;

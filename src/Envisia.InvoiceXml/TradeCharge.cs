@@ -42,6 +42,9 @@ namespace Envisia.InvoiceXml
     /// </summary>
     public class TradeCharge : AbstractTradeAllowanceCharge
     {
+        /// <summary>
+        /// Creates a charge (charge indicator true).
+        /// </summary>
         public TradeCharge()
         {
             this.ChargeIndicator = true;

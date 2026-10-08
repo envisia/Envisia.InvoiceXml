@@ -22,6 +22,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Fluent builder for <see cref="InvoiceFormatOptions"/>.
+    /// </summary>
     public sealed class InvoiceOptionsBuilder
     {
         private readonly InvoiceFormatOptions _options;
@@ -38,30 +41,47 @@ namespace Envisia.InvoiceXml
         } // !InvoiceOptionsBuilder()
 
 
+        /// <summary>
+        /// Creates a builder with empty options.
+        /// </summary>
         public static InvoiceOptionsBuilder Create()
         {
             return new InvoiceOptionsBuilder();
         } // !Create()
 
 
+        /// <summary>
+        /// Creates a builder that starts with a copy of the given options.
+        /// </summary>
+        /// <param name="options">Options to start from</param>
         public static InvoiceOptionsBuilder From(InvoiceFormatOptions options)
         {
             return new InvoiceOptionsBuilder(options);
         } // !From()
 
 
+        /// <summary>
+        /// Creates a builder with the recommended default options.
+        /// </summary>
         public static InvoiceOptionsBuilder CreateDefault()
         {
             return Create().UseRecommendedDefaults();
         } // !CreateDefault()
 
 
+        /// <summary>
+        /// Returns the configured options.
+        /// </summary>
         public InvoiceFormatOptions Build()
         {
             return _options;
         } // !Build()
 
 
+        /// <summary>
+        /// Enables or disables explanatory comments in the written XML.
+        /// </summary>
+        /// <param name="enable">True to write comments</param>
         public InvoiceOptionsBuilder EnableXmlComments(bool enable = true)
         {
             _options.IncludeXmlComments = enable;
@@ -69,6 +89,10 @@ namespace Envisia.InvoiceXml
         } // !EnableXmlComments()
 
 
+        /// <summary>
+        /// Adds comments that are written at the beginning of the XML document.
+        /// </summary>
+        /// <param name="comments">Comments to add</param>
         public InvoiceOptionsBuilder AddHeaderXmlComment(List<string> comments)
         {
             _options.XmlHeaderComments.AddRange(comments);
@@ -76,6 +100,10 @@ namespace Envisia.InvoiceXml
         } // !AddHeaderXmlComment()
 
 
+        /// <summary>
+        /// Adds a comment that is written at the beginning of the XML document. Empty comments are ignored.
+        /// </summary>
+        /// <param name="comment">Comment to add</param>
         public InvoiceOptionsBuilder AddHeaderXmlComment(string comment)
         {
             if (string.IsNullOrWhiteSpace(comment))
@@ -87,12 +115,18 @@ namespace Envisia.InvoiceXml
         } // !AddHeaderXmlComment()
 
 
+        /// <summary>
+        /// Applies the recommended defaults (no XML comments).
+        /// </summary>
         public InvoiceOptionsBuilder UseRecommendedDefaults()
         {
             return EnableXmlComments(false);
         } // !UseRecommendedDefaults()
 
 
+        /// <summary>
+        /// Removes characters that are not allowed in XML instead of throwing an <see cref="IllegalCharacterException"/>.
+        /// </summary>
         public InvoiceOptionsBuilder AutomaticallyCleanInvalidCharacters()
         {
             _options.AutomaticallyCleanInvalidCharacters = true;

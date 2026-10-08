@@ -22,6 +22,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// XML syntax of the invoice. Both syntaxes are defined by EN 16931.
+    /// </summary>
     public enum ZUGFeRDFormats
     {
         /// <summary>

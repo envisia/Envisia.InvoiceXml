@@ -23,6 +23,9 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Payment instructions of the invoice (BG-16): payment means code (BT-81), card information and direct debit details.
+    /// </summary>
     public class PaymentMeans
     {
         /// <summary>

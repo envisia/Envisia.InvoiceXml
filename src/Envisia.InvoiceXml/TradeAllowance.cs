@@ -42,6 +42,9 @@ namespace Envisia.InvoiceXml
     /// </summary>
     public class TradeAllowance : AbstractTradeAllowanceCharge
     {
+        /// <summary>
+        /// Creates an allowance (charge indicator false).
+        /// </summary>
         public TradeAllowance()
         {
             this.ChargeIndicator = false;

@@ -85,6 +85,9 @@ namespace Envisia.InvoiceXml
     }
 
 
+    /// <summary>
+    /// Helper functions for <see cref="Profile"/>.
+    /// </summary>
     public static class ProfileExtensions
     {
         internal static Profile FromString(this Profile _, string s)
@@ -180,6 +183,10 @@ namespace Envisia.InvoiceXml
         } // !EnumToString()
 
 
+        /// <summary>
+        /// Returns the conformance level name for the Factur-X / ZUGFeRD XMP metadata of a PDF/A-3 file
+        /// (fx:ConformanceLevel), e.g. "BASIC WL", "EN 16931" or "XRECHNUNG".
+        /// </summary>
         public static string GetXMPName(this Profile profile)
         {
             switch (profile)

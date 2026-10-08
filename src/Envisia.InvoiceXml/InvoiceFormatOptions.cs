@@ -22,10 +22,24 @@ using System.Text;
 
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Options that control how an invoice is written. Use <see cref="InvoiceOptionsBuilder"/> to create them.
+    /// </summary>
     public sealed class InvoiceFormatOptions
     {
+        /// <summary>
+        /// Comments that are written at the beginning of the XML document
+        /// </summary>
         public List<string> XmlHeaderComments { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Writes explanatory comments next to the XML elements
+        /// </summary>
         public bool IncludeXmlComments { get; internal set; } = false;
+
+        /// <summary>
+        /// Removes characters that are not allowed in XML from all values instead of throwing an <see cref="IllegalCharacterException"/>
+        /// </summary>
         public bool AutomaticallyCleanInvalidCharacters { get; internal set; } = false;
 
 

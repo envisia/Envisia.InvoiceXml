@@ -25,6 +25,9 @@ using System.Text;
 //
 namespace Envisia.InvoiceXml
 {
+    /// <summary>
+    /// Value added tax point date code (BT-8), UNTDID 2475 subset used in CII.
+    /// </summary>
     public enum DateTypeCodes
     {
         /// <summary>
