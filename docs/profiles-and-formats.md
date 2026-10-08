@@ -208,7 +208,7 @@ And here: https://www.roedl.de/themen/frankreich-e-invoice-reporting-umsatzsteue
 
 
 
-Thanks to [@Athilla](https://github.com/Athilla), this profile is also supported by ZUGFeRD-csharp.
+Thanks to [@Athilla](https://github.com/Athilla), this profile is also supported by the library.
 
 
 
@@ -225,6 +225,25 @@ descriptor.Save("factur-x.xml", ZUGFeRDVersion.Version23, Profile.EReporting);
 
 
 This information needs to be sent to the tax authorities. Different due dates apply for implementation for different sizes of companies.
+
+
+
+# Supported ZUGFeRD / Factur-X versions
+
+| `ZUGFeRDVersion` | ZUGFeRD | Factur-X | Notes |
+|---|---|---|---|
+| `Version1` | 1.0 | – | CII D13B, profiles BASIC, COMFORT, EXTENDED |
+| `Version20` | 2.0 | – | CII D16B |
+| `Version23` | 2.1, 2.1.1, 2.2, 2.3, 2.4 | 1.0 – 1.08 | CII D22B |
+| `Version25` | 2.5, 2.5.2 | 1.09 – 1.09.2 | CII D22B, adds the EXTENDED elements introduced with Factur-X 1.09 |
+
+The guideline identifiers (BT-24) are identical for all ZUGFeRD 2.1+ versions, so `Version23` and `Version25` only
+differ in the EXTENDED elements that were introduced with Factur-X 1.09 (debtor BIC and account name, manufacturer of an
+item, financial adjustments): they are only written with `Version25`, so invoices written with `Version23` stay valid
+for receivers that validate against ZUGFeRD 2.4. Other optional elements that were added in ZUGFeRD 2.4 / 2.5 (for
+example sub invoice lines or the item seller) are written when they are set. The writer is tested against the official
+XSDs of Factur-X 1.08 and 1.09.2 for every profile. When reading, `InvoiceDescriptor.GetVersion()` reports `Version23`
+for all ZUGFeRD 2.1+ invoices.
 
 
 
@@ -266,9 +285,9 @@ descriptor.Save("zugferd-v1.xml", ZUGFeRDVersion.Version1, Profile.Basic); // sa
 
 descriptor.Save("zugferd-v20.xml", ZUGFeRDVersion.Version20, Profile.Basic); // save as version 2.0, profile Basic
 
-descriptor.Save("zugferd-v23.xml", ZUGFeRDVersion.Version23, Profile.Basic); // save as version 2.3, profile Basic
+descriptor.Save("zugferd-v23.xml", ZUGFeRDVersion.Version23, Profile.Basic); // save as version 2.3+ (up to 2.5.2), profile Basic
 
-descriptor.Save("zugferd-v23-xrechnung.xml", ZUGFeRDVersion.Version23, Profile.XRechnung); // save as version 2.3, profile XRechnung
+descriptor.Save("zugferd-v23-xrechnung.xml", ZUGFeRDVersion.Version23, Profile.XRechnung); // save as XRechnung 3.0.x
 
 ```
 

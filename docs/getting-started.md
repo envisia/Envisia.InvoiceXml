@@ -1,82 +1,46 @@
 # Introduction
 
-The ZUGFeRD library allows to create XML files as required by German electronic invoice initiative ZUGFeRD as well invoices in the successor Factur-X. One special profile of Factur-X is the German XRechnung format.
+Envisia.InvoiceXml creates and reads the XML of structured electronic invoices according to EN 16931:
+ZUGFeRD 1.0/2.x, Factur-X (MINIMUM, BASIC WL, BASIC, EN 16931, EXTENDED) and XRechnung in CII and UBL syntax.
 
-The library is meant to be as simple as possible, however it is not straight forward to use as the resulting XML file contains a complete invoice in XML format. Please take a look at the ZUGFeRD-Test project to find sample creation code. This code creates the same XML file as shipped with the ZUGFeRD information package.
-
-
-
-# Consulting/ Commercial Support
-
-*Auf Deutsch:* Falls Sie kommerzielle Unterstützung bei der Umsetzung von ZUGFeRD/ XRechnung in Ihrem Unternehmen benötigen, schreiben Sie mir gerne an stephan@s2-industries.com
-
-
-
-*In English* In case you need consulting or commercial support for implementing ZUGFeRD/ XRechnung/ Factur-X in your company, please send an email to stephan@s2-industries.com
+The library tries to be as simple as possible. Still, an e-invoice is a complete invoice in XML, so it is worth
+going through the creation process step by step. The unit tests in `tests/Envisia.InvoiceXml.Tests` contain many
+more examples.
 
 
 
 # Relationship between the different standards
 
-Since there are a lot of terms and standards around electronic invoices, I'd like to lay out my understanding:
-
-
-
-- ZUGFeRD was developed by a German initiative as a standard for electronic invoices (https://www.ferd-net.de/).
-
-- ZUGFeRD 2.1 is identical to the German/French cooperation Factur-X (ZUGFeRD 2.1 = Factur-X 1.0) (https://www.ferd-net.de/en/standards/zugferd/factur-x).
-
-- The standard Factur-X 1.0 (respectively ZUGFeRD 2.1) is conform with the European norm EN 16931.
-
-- EN 16931 in turn is based on worldwide UN/CEFACT standard 'Cross Industry Invoice' (CII).
-
-- XRechnung as another German standard is a subset of EN 16931. It is defined by another party called KoSIT (https://www.xoev.de/). It comes with its own validation rules (https://xeinkauf.de/dokumente/).
-
-- This means that both Factur-X 1.0 (respectively ZUGFeRD 2.1) and XRechnung are conform with EN 16931. This does not automatically result that those invoices are per se identical.
-
-- To achieve compatibility, ZUGFeRD 2.1.1 introduced a XRechnung reference profile to guarantee compatibility between the two sister formats.
-
-
-
-# License
-
-Subject to the Apache license http://www.apache.org/licenses/LICENSE-2.0.html
+- ZUGFeRD was developed by the German Forum elektronische Rechnung Deutschland (FeRD, https://www.ferd-net.de/).
+- Since ZUGFeRD 2.1 it is technically identical to the French Factur-X standard (ZUGFeRD 2.1 = Factur-X 1.0,
+  ZUGFeRD 2.4 = Factur-X 1.08, ZUGFeRD 2.5 = Factur-X 1.09).
+- Factur-X / ZUGFeRD conforms to the European norm EN 16931, which in turn is based on the UN/CEFACT
+  Cross Industry Invoice (CII). EN 16931 also defines a binding to OASIS UBL 2.1.
+- XRechnung is the German CIUS (core invoice usage specification) of EN 16931, maintained by KoSIT
+  (https://xeinkauf.de/xrechnung/). It comes with its own validation rules and can be expressed in CII or UBL.
+- Factur-X / ZUGFeRD and XRechnung are both EN 16931 conformant, but that does not make the invoices identical;
+  ZUGFeRD therefore contains an XRECHNUNG reference profile.
 
 
 
 # Installation
 
-Just use nuget or Visual Studio Package Manager and download 'ZUGFeRD-csharp'.
+```shell
+dotnet add package Envisia.InvoiceXml
+```
 
-
-
-You can find more information about the nuget package here:
-
-
-
-[![NuGet](https://img.shields.io/nuget/v/ZUGFeRD-csharp?color=blue)](https://www.nuget.org/packages/ZUGFeRD-csharp/)
-
-
-
-https://www.nuget.org/packages/ZUGFeRD-csharp/
+or search for `Envisia.InvoiceXml` in the NuGet package manager.
 
 
 
 # Building on your own
 
-Prerequisites:
+Prerequisites: .NET 10 SDK.
 
-* Visual Studio >= 2017
-
-* .net Framework >= 4.6.1 (for .net Standard 2.0 support)
-
-
-
-Open ZUGFeRD/ZUGFeRD.sln solution file. Choose Release or Debug mode and hit 'Build'. That's it.
-
-
-
-For running the tests, open ZUGFeRD-Test/ZUGFeRD-Test.sln and run the unit tests. The tests show good cases on how to use the library.
+```shell
+dotnet build Envisia.InvoiceXml.sln
+dotnet test Envisia.InvoiceXml.sln
+```
 
 
 
@@ -229,39 +193,22 @@ which will generate an invoice with two trade line items, with the first one as 
 
 ## Storing the invoice
 ```csharp
-FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.Write);
-desc.Save(stream, ZUGFeRDVersion.Version23, Profile.XRechnung);
-stream.Flush();
-stream.Close();    
+using (FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
+{
+    desc.Save(stream, ZUGFeRDVersion.Version23, Profile.XRechnung);
+}
 ```
 
+`ZUGFeRDVersion.Version23` writes ZUGFeRD 2.1 – 2.4 (Factur-X 1.0 – 1.08) invoices, `ZUGFeRDVersion.Version25` ZUGFeRD 2.5
+(Factur-X 1.09) invoices, which may contain the EXTENDED elements that were introduced with 2.5. The guideline identifiers
+did not change between these versions (see [profiles and formats](profiles-and-formats.md)). XRechnung is written as
+XRechnung 3.0 (valid for 3.0.x, currently 3.0.2).
 
 
-# Working with ZUGFeRD PDF files
-The ZUGFeRD-csharp component has a sister component which relies on [PDFSharp](https://github.com/empira/PDFsharp) to read and write PDF files.
 
-Download the package here:
+# Hybrid invoices (PDF/A-3)
 
-[![NuGet](https://img.shields.io/nuget/v/ZUGFeRD.PDF-csharp?color=blue)](https://www.nuget.org/packages/ZUGFeRD.PDF-csharp/)
-
-The component makes loading the invoice from a pdf as easy as this:
-
-```csharp
-InvoiceDescriptor desc = await InvoicePdfProcessor.LoadFromPdfAsync("invoice.pdf");
-
-// alternatively, you can invoke the function in synchronous manner:
-InvoiceDescriptor desc = InvoicePdfProcessor.LoadFromPdf("invoice.pdf");
-```
-
-Converting a PDF file to a ZUGFeRD PDF/A is almost as simple:
-
-```csharp
-InvoiceDescriptor descriptor = InvoiceDescriptor.CreateInvoice("471102", new DateTime(2018, 03, 05), CurrencyCodes.EUR);
-// ... fill the descriptor
-
-await InvoicePdfProcessor.SaveToPdfAsync("zugferd-invoice.pdf", ZUGFeRDVersion.Version23, Profile.Comfort, ZUGFeRDFormats.CII, "input-invoice.pdf", descriptor);
-
-// alternatively, you can invoke the function in synchronous manner:
-InvoicePdfProcessor.SaveToPdf("zugferd-invoice.pdf", ZUGFeRDVersion.Version23, Profile.Comfort, ZUGFeRDFormats.CII, "input-invoice.pdf", descriptor);
-```
-
+ZUGFeRD and Factur-X invoices are usually exchanged as PDF/A-3 files with the invoice XML embedded as
+`factur-x.xml` (ZUGFeRD 2.x) or `xrechnung.xml`. Envisia.InvoiceXml deliberately only deals with the XML; use a
+PDF library that supports PDF/A-3 attachments and the Factur-X XMP metadata to create or read the PDF.
+`ProfileExtensions.GetXMPName()` returns the conformance level name required for the XMP metadata.
