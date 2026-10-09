@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Prototype: the KoSIT validator (Java) converted to .NET with IKVM. Not part of Envisia.InvoiceXml.sln. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IKVM" Version="8.16.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- built by build-kosit.sh -->
+    <IkvmReference Include="lib/kosit-validator-java8.jar">
+      <AssemblyName>Kosit.Validator</AssemblyName>
+      <AssemblyVersion>1.6.3.0</AssemblyVersion>
+      <AssemblyFileVersion>1.6.3.0</AssemblyFileVersion>
+    </IkvmReference>
+  </ItemGroup>
+</Project>
