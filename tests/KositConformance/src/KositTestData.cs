@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-using System.Runtime.CompilerServices;
-
 namespace Envisia.InvoiceXml.Tests.KositConformance
 {
     /// <summary>
@@ -29,7 +27,7 @@ namespace Envisia.InvoiceXml.Tests.KositConformance
         public const string KositVersion = "1.6.3";
 
 
-        public static string SuiteDirectory { get; } = Path.GetDirectoryName(Path.GetDirectoryName(_ThisFile()))!;
+        public static string SuiteDirectory { get; } = Path.Combine(_FindRepositoryRoot(), "tests", "KositConformance");
 
         public static string BuildDirectory { get; } = Environment.GetEnvironmentVariable("KOSIT_TESTDATA") ?? Path.Combine(SuiteDirectory, "build");
 
@@ -109,9 +107,20 @@ namespace Envisia.InvoiceXml.Tests.KositConformance
         }
 
 
-        private static string _ThisFile([CallerFilePath] string path = "")
+        // from the test output directory: the source paths of CI builds are mapped (ContinuousIntegrationBuild)
+        private static string _FindRepositoryRoot()
         {
-            return path;
+            DirectoryInfo? directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (directory != null)
+            {
+                if (File.Exists(Path.Combine(directory.FullName, "Envisia.InvoiceXml.sln")))
+                {
+                    return directory.FullName;
+                }
+                directory = directory.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Could not find the repository root starting at " + AppContext.BaseDirectory);
         }
     }
 }
