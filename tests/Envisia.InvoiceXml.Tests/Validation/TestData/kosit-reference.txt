@@ -1,0 +1,1234 @@
+# Reference results of the KoSIT validator 1.6.3 (Saxon-HE 12.9) for the documents below, created with
+# the configuration validator-configuration-xrechnung 2026-08-31 (CEN rules 1.3.16, XRechnung Schematron 2.6.0)
+# and, for the Factur-X samples, Resources/scenarios/factur-x.xml with the compiled XSLT published with Factur-X 1.09.2.
+# Format: "## <configuration> <document>", then the scenario, the report validity, the assessment, the validation steps
+# and the Schematron messages (id|code|level|xpathLocation|text). Messages of the XML schema step are only counted,
+# their texts depend on the XML parser.
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/04.01a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|UBL-CR-646|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-646]-A UBL invoice should not include the InvoiceLine SubInvoiceLine
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/04.02a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|UBL-CR-646|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-646]-A UBL invoice should not include the InvoiceLine SubInvoiceLine
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/04.03a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|UBL-CR-646|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-646]-A UBL invoice should not include the InvoiceLine SubInvoiceLine
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/04.04a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|UBL-CR-646|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-646]-A UBL invoice should not include the InvoiceLine SubInvoiceLine
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/04.05a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung Extension (CII)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=4
+message val-sch.1.1|BR-CL-21|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:GlobalID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-CL-21]-Item standard identifier scheme identifier MUST belong to the ISO 6523 ICD code list
+message val-sch.1.2|BR-CL-10|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SellerTradeParty[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:GlobalID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-CL-10]-Any identifier identification scheme identifier MUST be coded using one of the ISO 6523 ICD list.
+message val-sch.1.3|BR-CL-10|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerTradeParty[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:GlobalID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-CL-10]-Any identifier identification scheme identifier MUST be coded using one of the ISO 6523 ICD list.
+message val-sch.1.4|BR-CL-10|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:PayeeTradeParty[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:GlobalID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-CL-10]-Any identifier identification scheme identifier MUST be coded using one of the ISO 6523 ICD list.
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/extension/05.01a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|BR-CO-16|error|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]/*:LegalMonetaryTotal[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2'][1]|[BR-CO-16]-Amount due for payment (BT-115) = Invoice total amount with VAT (BT-112) -Paid amount (BT-113) +Rounding amount (BT-114).
+message val-sch.1.2|UBL-CR-470|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-470]-A UBL invoice should not include the PrepaidPayment
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.01a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.02a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.02a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.03a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.03a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.04a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.04a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.05a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.05a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.06a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.06a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.07a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.07a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.08a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.08a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.09a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.09a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.10a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.10a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.11a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.11a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.12a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.12a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.13a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.13a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.14a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.14a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.15a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.15a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.17a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.17a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.18a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.18a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.19a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.19a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.20a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.20a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.21a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/01.21a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.01a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.01a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.02a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.02a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.03a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.03a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.04a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.04a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.05a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.05a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.06a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/02.06a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.01a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.01a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.02a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.02a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.03a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.03a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|CII-SR-475|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-475] - Only one AdditionalReferencedDocument Name BT-123 is allowed with TypeCode 916.
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.04a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.04a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.05a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.05a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.06a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.06a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.07a-INVOICE_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/business-cases/standard/03.07a-INVOICE_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|CII-SR-475|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-475] - Only one AdditionalReferencedDocument Name BT-123 is allowed with TypeCode 916.
+message val-sch.1.2|CII-SR-476|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-476] - Only one AdditionalReferencedDocument AttachmentBinaryObject BT-125 is allowed with TypeCode 916.
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.01_comprehensive_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.01_comprehensive_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|CII-SR-475|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-475] - Only one AdditionalReferencedDocument Name BT-123 is allowed with TypeCode 916.
+message val-sch.1.2|CII-SR-476|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-476] - Only one AdditionalReferencedDocument AttachmentBinaryObject BT-125 is allowed with TypeCode 916.
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.02_comprehensive_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.02_comprehensive_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.03_comprehensive_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.03_comprehensive_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.04_comprehensive_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.04_comprehensive_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.05_minimal_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.05_minimal_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.06_minimal_test_ubl.xml
+scenario=EN16931 XRechnung (UBL Invoice)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cius/01.06_minimal_test_uncefact.xml
+scenario=EN16931 XRechnung (CII)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-sch.2 valid=true messages=1
+message val-sch.2.1|BR-DE-TMP-32|information|/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}CrossIndustryInvoice[1]/Q{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}SupplyChainTradeTransaction[1]|[BR-DE-TMP-32] Eine Rechnung sollte zur Angabe des Liefer-/Leistungsdatums entweder BT-72 "Actual delivery date", BG-14 "Invoicing period" oder in jeder Rechnungsposition BG-26 "Invoice line period" enthalten.
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cvd/02.01a-cvd_INVOICE_ubl.xml
+scenario=EN16931 XRechnung CVD (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|BR-CL-13|error|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]/*:InvoiceLine[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2'][1]/*:Item[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2'][1]/*:CommodityClassification[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2'][1]/*:ItemClassificationCode[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2'][1]|[BR-CL-13]-Item classification identifier identification scheme identifier MUST be coded using one of the UNTDID 7143 list.
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung xrechnung-testsuite/src/test/technical-cases/cvd/02.01a-cvd_INVOICE_uncefact.xml
+scenario=EN16931 XRechnung CVD (CII)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|BR-CL-13|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:DesignatedProductClassification[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:ClassCode[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-CL-13]-Item classification identifier identification scheme identifier MUST be coded using one of the UNTDID 7143 list.
+step val-sch.2 valid=true messages=0
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-error/bin001.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=false messages=1
+## xrechnung kosit-instances/processing-error/ubl007.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=false messages=1
+## xrechnung kosit-instances/processing-valid/cii001.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl-br-dex-09-prepaidpayment.xml
+scenario=EN16931 XRechnung Extension (UBL Invoice)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|BR-CO-16|error|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]/*:LegalMonetaryTotal[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2'][1]|[BR-CO-16]-Amount due for payment (BT-115) = Invoice total amount with VAT (BT-112) -Paid amount (BT-113) +Rounding amount (BT-114).
+message val-sch.1.2|UBL-CR-470|warning|/*:Invoice[namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:Invoice-2'][1]|[UBL-CR-470]-A UBL invoice should not include the PrepaidPayment
+step val-sch.2 valid=false messages=3
+message val-sch.2.1|BR-TMP-6|warning|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueDate[1]|[BR-TMP-6] Datumsangaben in UBL müssen im Format JJJJ-MM-TT (YYYY-MM-DD) übermittelt werden.
+message val-sch.2.2|BR-TMP-6|warning|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}InvoiceLine[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}InvoicePeriod[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}StartDate[1]|[BR-TMP-6] Datumsangaben in UBL müssen im Format JJJJ-MM-TT (YYYY-MM-DD) übermittelt werden.
+message val-sch.2.3|BR-TMP-6|warning|/Q{urn:oasis:names:specification:ubl:schema:xsd:Invoice-2}Invoice[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}InvoiceLine[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}InvoicePeriod[1]/Q{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}EndDate[1]|[BR-TMP-6] Datumsangaben in UBL müssen im Format JJJJ-MM-TT (YYYY-MM-DD) übermittelt werden.
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl001.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl002.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl003.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl004.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl005.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl006.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## xrechnung kosit-instances/processing-valid/ubl008.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/0. MINIMUM/MINIMUM_Buchungshilfe/MINIMUM_Buchungshilfe.xml
+scenario=ZUGFeRD / Factur-X (MINIMUM)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/0. MINIMUM/MINIMUM_Rechnung/MINIMUM_Rechnung.xml
+scenario=ZUGFeRD / Factur-X (MINIMUM)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/1. BASIC WL/BASIC-WL_Buchungshilfe/BASIC-WL_Buchungshilfe.xml
+scenario=ZUGFeRD / Factur-X (BASIC WL)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/1. BASIC WL/BASIC-WL_Einfach/BASIC-WL_Einfach.xml
+scenario=ZUGFeRD / Factur-X (BASIC WL)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/2. BASIC/BASIC_Einfach/BASIC_Einfach.xml
+scenario=ZUGFeRD / Factur-X (BASIC)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/2. BASIC/BASIC_Rechnungskorrektur/BASIC_Rechnungskorrektur.xml
+scenario=ZUGFeRD / Factur-X (BASIC)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/2. BASIC/BASIC_Taxifahrt/BASIC_Taxifahrt.xml
+scenario=ZUGFeRD / Factur-X (BASIC)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_1_Teilrechnung/EN16931_1_Teilrechnung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_2_Teilrechnung/EN16931_2_Teilrechnung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_AbweichenderZahlungsempfaenger/EN16931_AbweichenderZahlungsempf.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Betriebskostenabrechnung/EN16931_Betriebskostenabrechnung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Einfach/EN16931_Einfach.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Einfach_DueDate/EN16931_Einfach_DueDate.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Einfach_negativePaymentDue/EN16931_Einfach_negativePaymentDue.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Elektron/EN16931_Elektron_Anlage_XML.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_ElektronischeAdresse/EN16931_ElektronischeAdresse.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Gutschrift/EN16931_Gutschrift.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Haftpflichtversicherung_Versicherungssteuer/EN16931_Haftpflichtversicherung_Versicherungssteuer.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Innergemeinschaftliche_Lieferungen/EN16931_Innergemeinschaftliche_Lieferungen.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Kleinunternehmer_ohne_USt_ID/EN16931_Kleinunternehmer_ohneUStId.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Kraftfahrversicherung_Bruttopreise/EN16931_Kraftfahrversicherung_Bruttopreise.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Miete/EN16931_Miete.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_OEPNV/EN16931_OEPNV.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=3
+message val-sch.1.1|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SellerTradeParty[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:PostalTradeAddress[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:LineTwo[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+message val-sch.1.2|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerTradeParty[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:PostalTradeAddress[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:LineTwo[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+message val-sch.1.3|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SpecifiedTradeSettlementPaymentMeans[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:PayeeSpecifiedCreditorFinancialInstitution[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BICID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Photovoltaik/EN16931_Photovoltaik.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Physiotherapeut/EN16931_Physiotherapeut.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Rabatte/EN16931_Rabatte.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_RechnungsUebertragung/EN16931_RechnungsUebertragung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Rechnungskorrektur/EN16931_Rechnungskorrektur.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Reisekostenabrechnung/EN16931_Reisekostenabrechnung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|CII-SR-475|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-475] - Only one AdditionalReferencedDocument Name BT-123 is allowed with TypeCode 916.
+message val-sch.1.2|CII-SR-476|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeAgreement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[CII-SR-476] - Only one AdditionalReferencedDocument AttachmentBinaryObject BT-125 is allowed with TypeCode 916.
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_SEPA_Prenotification/EN16931_SEPA_Prenotification.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_Sachversicherung_berechneter_Steuersatz/EN16931_Sachversicherung_berechneter_Steuersatz.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/3. EN16931/EN16931_steuerbefreite Auslandslieferung/EN16931_steuerbefreite_Auslandslieferung.xml
+scenario=ZUGFeRD / Factur-X (EN 16931)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Abschlagsrechnung SubInvoiceLine Bsp 1/ZUGFeRD_Extended__Abschlagsrechnung_SubInvoiceLine_u_LV_Nr_.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Bau Teil- & Schlussrechnungen mit Steuerzusammenstellung/Extended_einfach_Bau_Schlussrechnung_mit_Steuer_Zusammenstellung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Bau Teil- & Schlussrechnungen mit Steuerzusammenstellung/Extended_einfach_Bau__1_Abschlagsrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Bau Teil- & Schlussrechnungen mit Steuerzusammenstellung/Extended_einfach_Bau__2_Abschlagsrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_Fremdwaehrung/EXTENDED_Fremdwaehrung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_InnergemeinschLieferungMehrereBestellungen/EXTENDED_InnergemeinschLieferungMehrereBestellungen.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_Kostenrechnung/EXTENDED_Kostenrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_Projektabschlussrechnung/EXTENDED_Projektabschlussrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_Rechnungskorrektur/EXTENDED_Rechnungskorrektur.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/EXTENDED_Warenrechnung/EXTENDED_Warenrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Herkunftsland Zolltarif-Nr_HS_UNSPSC_TST_eClass_STQ/Herkunftsland_Zolltarif-Nummer__HS___UNSPSC__TST___eCl_ss__STQ.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Kleinunternehmer ohne USt_ID/EXTENDED_Kleinunternehmer_ohneUStId.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|BR-FXEXT-E-08rev|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:ApplicableTradeTax[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-FXEXT-E-08rev] - In a VAT breakdown (BG-23) where VAT category code (BT-118) is equal to “E” ("Exempt from VAT"), Absolute Value of (VAT category taxable amount (BT-116) - ∑ Invoice line net amounts (BT-131) + Σ Document level allowance amounts (BT-92) - Σ Document level charge amounts (BT-99) - Σ Logistics Service fee amounts (BT-X-272)) <= 0,01 * ((Number of line net amounts (BT-131) + Number of Document level allowance amounts (BT-92) + Number of Document level charge amounts (BT-99) + Number of Logistics Service fee amounts (BT-X-272)), where the VAT category code (BT-151, BT-95, BT-102, BT-X-273) is "Exempt from VAT" (E), and where applicable the VAT exemption reason and specification code (BT-195, BT-174 and BT-176 and BT-X-592) and the Exemption reason text (BT-194, BT-173 and BT-175 and BT-X-591) are identical with the VAT category VAT exemption reason and specification code (BT-121) and VAT exemption reason text (BT-120), but only for lines where the "Subtype of invoice item" (BT-X-8) has the value "DETAIL" or is not specified
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Maschinen Serial-Nr/ZF_Extended_Maschinen-Serial_NR__BT-X-307.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Sammel_Rechnung_3 Bestellungen/ZF_Extended__Sammelrechnung_3_Bestellungen.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/SubInvoiceLine Büromaterial Bsp 3/Extended___SubInvoiceLines_Buero_Material_Bsp3__.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/SubInvoiceLines Fallschutzset Bsp 5/Extended_Fallschutz-Set_SubInvoiceLine_Bsp5.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/SubInvoiceLines Hardware Bsp 2/Extended_SubInvoiceLines_Hardware_Bsp2.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=true
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=true messages=0
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/Subinvoiceline Kaffee Bundle Set Bsp 4/Extended___SubInvoiceLines_Kaffee_Bundle_Set_Bsp4__.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=false
+assessment=reject
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|BR-S-05|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:SpecifiedLineTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:ApplicableTradeTax[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-S-05]-In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is "Standard rated" the Invoiced item VAT rate (BT-152) shall be greater than zero.
+message val-sch.1.2|BR-S-05|error|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][4]/*:SpecifiedLineTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:ApplicableTradeTax[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-S-05]-In an Invoice line (BG-25) where the Invoiced item VAT category code (BT-151) is "Standard rated" the Invoiced item VAT rate (BT-152) shall be greater than zero.
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/4. EXTENDED/steuerfreie Innergemeinschaftliche Lieferung/ZF_Extended_steuerfreie_Innergemeinschaftliche_Lieferung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=1
+message val-sch.1.1|BR-FXEXT-E-08rev|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:ApplicableHeaderTradeSettlement[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:ApplicableTradeTax[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[BR-FXEXT-E-08rev] - In a VAT breakdown (BG-23) where VAT category code (BT-118) is equal to “E” ("Exempt from VAT"), Absolute Value of (VAT category taxable amount (BT-116) - ∑ Invoice line net amounts (BT-131) + Σ Document level allowance amounts (BT-92) - Σ Document level charge amounts (BT-99) - Σ Logistics Service fee amounts (BT-X-272)) <= 0,01 * ((Number of line net amounts (BT-131) + Number of Document level allowance amounts (BT-92) + Number of Document level charge amounts (BT-99) + Number of Logistics Service fee amounts (BT-X-272)), where the VAT category code (BT-151, BT-95, BT-102, BT-X-273) is "Exempt from VAT" (E), and where applicable the VAT exemption reason and specification code (BT-195, BT-174 and BT-176 and BT-X-592) and the Exemption reason text (BT-194, BT-173 and BT-175 and BT-X-591) are identical with the VAT category VAT exemption reason and specification code (BT-121) and VAT exemption reason text (BT-120), but only for lines where the "Subtype of invoice item" (BT-X-8) has the value "DETAIL" or is not specified
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/5. XRECHNUNG/XRECHNUNG_Betriebskostenabrechnung/XRECHNUNG_Betriebskostenabrechnung.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/5. XRECHNUNG/XRECHNUNG_Einfach/XRECHNUNG_Einfach.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/5. XRECHNUNG/XRECHNUNG_Elektron/XRECHNUNG_Elektron.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd240en/Examples/5. XRECHNUNG/XRECHNUNG_Reisekostenabrechnung/XRECHNUNG_Reisekostenabrechnung.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd21de/Beispiele/EN16931/zugferd_2p1_EN16931_Betriebskostenabrechnung_XRechnung.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd21de/Beispiele/EN16931/zugferd_2p1_EN16931_Reisekostenabrechnung_XRechnung.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd21de/Beispiele/EXTENDED/factur-x.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][4]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerAssignedID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+message val-sch.1.2|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][5]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerAssignedID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd211de/Beispiele/EXTENDED/zugferd_2p1_EXTENDED_Warenrechnung.xml
+scenario=ZUGFeRD / Factur-X (EXTENDED)
+valid=false
+assessment=accept
+step val-xsd valid=true messages=0
+step val-sch.1 valid=false messages=2
+message val-sch.1.1|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][4]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerAssignedID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+message val-sch.1.2|PEPPOL-EN16931-R008|warning|/*:CrossIndustryInvoice[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:SupplyChainTradeTransaction[namespace-uri()='urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'][1]/*:IncludedSupplyChainTradeLineItem[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][5]/*:SpecifiedTradeProduct[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]/*:BuyerAssignedID[namespace-uri()='urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100'][1]|[PEPPOL-EN16931-R008]-Document MUST not contain empty elements. (still status warning)
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd211de/Beispiele/XRECHNUNG/zugferd_2p1_XRECHNUNG_Einfach.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0
+## factur-x documentation/zugferd211de/Beispiele/XRECHNUNG/zugferd_2p1_XRECHNUNG_Elektron.xml
+scenario=(none)
+valid=false
+assessment=reject
+step val-xml valid=true messages=0

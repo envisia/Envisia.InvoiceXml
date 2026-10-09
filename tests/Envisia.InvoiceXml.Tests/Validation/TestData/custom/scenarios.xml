@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenarios xmlns="http://www.xoev.de/de/validator/framework/1/scenarios" frameworkVersion="1.0.0">
+  <name>Test configuration</name>
+  <author>envisia GmbH</author>
+  <date>2026-10-08</date>
+  <description><p>Orders</p></description>
+  <scenario>
+    <name>Example order</name>
+    <description><p>Example orders</p></description>
+    <namespace prefix="o">urn:example:order</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/o:Order)</match>
+    <validateWithXmlSchema>
+      <resource><name>Order schema</name><location>order.xsd</location></resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource><name>Order rules</name><location>rules.sch</location></resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource><name>Report</name><location>report.xsl</location></resource>
+      <customLevel level="warning">L-01</customLevel>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <noScenarioReport>
+    <resource><name>Default report</name><location>report.xsl</location></resource>
+  </noScenarioReport>
+</scenarios>

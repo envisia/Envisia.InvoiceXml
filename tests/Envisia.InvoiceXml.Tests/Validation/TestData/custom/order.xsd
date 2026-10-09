@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:example:order" xmlns="urn:example:order" elementFormDefault="qualified">
+  <xs:element name="Order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Id" type="xs:string" minOccurs="0"/>
+        <xs:element name="Note" type="xs:string" minOccurs="0"/>
+        <xs:element name="Line" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Product" type="xs:string"/>
+              <xs:element name="Quantity" type="xs:decimal"/>
+              <xs:element name="Price" type="xs:decimal"/>
+              <xs:element name="Total" type="xs:decimal"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

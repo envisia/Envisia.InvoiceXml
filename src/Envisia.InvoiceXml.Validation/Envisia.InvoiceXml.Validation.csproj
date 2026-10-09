@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Envisia.InvoiceXml.Validation</AssemblyName>
+    <RootNamespace>Envisia.InvoiceXml.Validation</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
+
+    <!-- NuGet package -->
+    <IsPackable>true</IsPackable>
+    <PackageId>Envisia.InvoiceXml.Validation</PackageId>
+    <Title>Envisia.InvoiceXml.Validation – EN 16931, XRechnung and ZUGFeRD / Factur-X validator</Title>
+    <Description>Validates electronic invoices (XRechnung, ZUGFeRD / Factur-X, EN 16931 in UBL and CII syntax) against the official XML schemas and Schematron rules and creates validation reports in the format of the KoSIT validator (XML and HTML). Pure .NET: ships its own XPath 2.0 and ISO Schematron engine, no Java required.</Description>
+    <PackageTags>en16931;e-invoice;einvoice;e-rechnung;zugferd;factur-x;facturx;xrechnung;cii;ubl;invoice;xml;validator;validation;schematron;kosit</PackageTags>
+    <PackageLicenseExpression>Apache-2.0 AND EUPL-1.2</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/envisia/ZUGFeRD-csharp/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Envisia.InvoiceXml\Envisia.InvoiceXml.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The official validation artefacts (XML schemas, Schematron rules and code lists) are embedded and
+         addressed by their path below Resources/, e.g. "xrechnung/schematron/ubl/XRechnung-UBL-validation.sch". -->
+    <EmbeddedResource Include="Resources\**\*" Exclude="Resources\**\*.md">
+      <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\','/'))</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\NOTICE" Pack="true" PackagePath="\" />
+    <None Include="Resources\THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Envisia.InvoiceXml.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001001b51094fa4770806adadd97d5b2a5529a3c5e1bdd14cb7756bf566457dbddcc1a7cd4be17e865498c3ec56cdc673f71af9647502cf523c314bad15d7331d2e8b79213e50afde60fc2220b886cb825a2154e441dd743a6c0b23219f1c6f3ca9628f1c4f2ec503d4774330ae4a634e4ef727acbfc18e3aa2d01c75dfe53577a4d5" />
+  </ItemGroup>
+</Project>

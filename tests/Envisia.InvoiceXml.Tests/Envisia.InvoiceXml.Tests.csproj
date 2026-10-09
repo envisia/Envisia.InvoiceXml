@@ -8,6 +8,10 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+
+    <!-- signed with the same key as the libraries so the validator's internals (XPath engine) can be tested -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Validation\TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Envisia.InvoiceXml\Envisia.InvoiceXml.csproj" />
+  </ItemGroup>
+
+  <!-- the validation package targets .NET 10 only; on .NET 8 only the library itself is tested -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <ProjectReference Include="..\..\src\Envisia.InvoiceXml.Validation\Envisia.InvoiceXml.Validation.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+    <Compile Remove="Validation\**" />
   </ItemGroup>
 
 </Project>

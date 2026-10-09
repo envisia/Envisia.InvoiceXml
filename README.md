@@ -11,6 +11,11 @@ ZUGFeRD, Factur-X and XRechnung – in both EN 16931 syntaxes, UN/CEFACT **CII**
 The library produces and parses the invoice XML. Embedding the XML into a PDF/A-3 (hybrid
 ZUGFeRD / Factur-X invoice) is intentionally left to the PDF library of your choice.
 
+| Package | Purpose |
+|---|---|
+| [Envisia.InvoiceXml](https://www.nuget.org/packages/Envisia.InvoiceXml) | Create and read invoice XML |
+| [Envisia.InvoiceXml.Validation](https://www.nuget.org/packages/Envisia.InvoiceXml.Validation) | Validate invoice XML with the official XSD and Schematron rules of XRechnung, ZUGFeRD / Factur-X and EN 16931; reports like the KoSIT validator. Pure .NET, no Java |
+
 ## Supported standards
 
 | Standard | Versions | Profiles | Syntax | Read | Write |
@@ -43,9 +48,11 @@ ZUGFeRD 2.4 example invoices and validates XRechnung UBL output against the OASI
 
 ```shell
 dotnet add package Envisia.InvoiceXml
+dotnet add package Envisia.InvoiceXml.Validation   # optional, the validator
 ```
 
-Target frameworks: .NET 10, .NET 8, .NET Standard 2.0/2.1, .NET Framework 4.6.2 and 4.8.
+Target frameworks: .NET 10, .NET 8, .NET Standard 2.0/2.1, .NET Framework 4.6.2 and 4.8
+(Envisia.InvoiceXml.Validation: .NET 10).
 
 ## Quick start
 
@@ -96,18 +103,40 @@ writer leaves out everything the profile does not know (for example, MINIMUM onl
 document header and totals), so an invoice read from a richer profile can be written as a
 schema-valid invoice of a smaller one.
 
-### Calculation checks
+### Validation
 
-`InvoiceValidator.Validate(invoice, ZUGFeRDVersion.Version23)` recalculates line totals, allowances/charges, the VAT
-breakdown and the document totals (BR-CO-*) and reports deviations. For full compliance
-checks of the generated XML use the official validators: the KoSIT validator for XRechnung and
-the Factur-X / ZUGFeRD Schematron (e.g. via [Mustang](https://www.mustangproject.org)).
+`Envisia.InvoiceXml.Validation` checks invoice XML against the official XML schemas and Schematron
+rules – XRechnung 3.0.2 (the configuration of the KoSIT validator), ZUGFeRD 2.5.2 / Factur-X 1.09.2
+in all profiles and EN 16931 in UBL and CII – and creates the XML and HTML reports of the KoSIT
+validator. It runs the Schematron sources with its own XPath engine, without Java:
+
+```csharp
+using Envisia.InvoiceXml.Validation;
+
+ValidationReport report = invoice.ValidateXml(ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL);
+// or for any file: new InvoiceXmlValidator().Validate("incoming-invoice.xml")
+if (!report.IsAcceptable)
+{
+    foreach (ValidationMessage error in report.Errors)
+    {
+        Console.WriteLine($"{error.Code}: {error.Text}");
+    }
+}
+report.SaveHtml("report.html");
+```
+
+See [Validation](docs/validation.md) for the configurations, the report and custom rules.
+
+`InvoiceValidator.Validate(invoice, ZUGFeRDVersion.Version23)` in the main package only recalculates line
+totals, allowances/charges, the VAT breakdown and the document totals (BR-CO-*) of an `InvoiceDescriptor`
+and reports deviations.
 
 More documentation:
 
 - [Getting started](docs/getting-started.md)
 - [Profiles and formats](docs/profiles-and-formats.md)
 - [ZUGFeRD details](docs/zugferd-details.md)
+- [Validation](docs/validation.md)
 - [References](docs/references.md)
 
 ## Migrating from ZUGFeRD-csharp
@@ -142,7 +171,9 @@ If Envisia.InvoiceXml is useful for you, please consider sponsoring its developm
 
 ## License and attribution
 
-Licensed under the [Apache License 2.0](LICENSE).
+Licensed under the [Apache License 2.0](LICENSE). The validation package embeds the official
+validation artefacts under their own licenses (the CEN EN 16931 Schematron rules under the EUPL 1.2),
+see [THIRD-PARTY-NOTICES.md](src/Envisia.InvoiceXml.Validation/Resources/THIRD-PARTY-NOTICES.md).
 
 Envisia.InvoiceXml is a derivative of [ZUGFeRD-csharp](https://github.com/stephanstapel/ZUGFeRD-csharp)
 by Stephan Stapel / STwo Industries GmbH and its contributors. See [NOTICE](NOTICE).

@@ -6,6 +6,9 @@
 * EN 16931 code lists and validation artefacts (European Commission):
   https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/Registry+of+supporting+artefacts+to+implement+EN16931
 * UBL syntax (Peppol BIS Billing 3.0): https://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/
+* CEN EN 16931 validation artefacts: https://github.com/ConnectingEurope/eInvoicing-EN16931
+* KoSIT validator and its XRechnung configuration: https://github.com/itplr-kosit/validator,
+  https://github.com/itplr-kosit/validator-configuration-xrechnung
 
 
 

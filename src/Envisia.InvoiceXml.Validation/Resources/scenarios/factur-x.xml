@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Validation scenarios for ZUGFeRD 2.x / Factur-X 1.x invoices (UN/CEFACT CII), in the configuration format of
+  the KoSIT validator. The XML schemas and Schematron rules are the official artefacts of Factur-X 1.09.2 /
+  ZUGFeRD 2.5.2. The guideline identifiers (BT-24) did not change since Factur-X 1.0 / ZUGFeRD 2.1, so the
+  scenarios match invoices of all these versions. Invoices of the XRECHNUNG profile are covered by the XRechnung
+  configuration. Resource locations are relative to the embedded Resources/ folder.
+  -->
+<scenarios xmlns="http://www.xoev.de/de/validator/framework/1/scenarios" frameworkVersion="1.0.0">
+  <name>Validator Configuration ZUGFeRD 2.5.2 / Factur-X 1.09.2</name>
+  <author>envisia GmbH</author>
+  <date>2026-10-08</date>
+  <description>
+    <p>Checks whether XML documents conform to the ZUGFeRD 2.x / Factur-X 1.x profiles MINIMUM, BASIC WL, BASIC,
+      EN 16931 and EXTENDED.</p>
+    <p>It uses the XML schemas and Schematron rules of Factur-X 1.09.2 (ZUGFeRD 2.5.2), released 2026-08-04
+      (https://fnfe-mpe.org/factur-x/, https://www.ferd-net.de).</p>
+  </description>
+
+  <scenario>
+    <name>ZUGFeRD / Factur-X (MINIMUM)</name>
+    <description>
+      <p>Validates UN/CEFACT Cross Industry Invoice documents of the ZUGFeRD / Factur-X profile MINIMUM
+        (guideline urn:factur-x.eu:1p0:minimum).</p>
+      <p>Uses the Factur-X 1.09.2 XML schema and Schematron rules of the profile MINIMUM.</p>
+    </description>
+    <namespace prefix="rsm">urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100</namespace>
+    <namespace prefix="ram">urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/rsm:CrossIndustryInvoice[rsm:ExchangedDocumentContext/ram:GuidelineSpecifiedDocumentContextParameter/ram:ID/text() = 'urn:factur-x.eu:1p0:minimum'])</match>
+    <validateWithXmlSchema>
+      <resource>
+        <name>XML Schema for Factur-X 1.09.2 MINIMUM</name>
+        <location>facturx/schema/MINIMUM/FACTUR-X_MINIMUM.xsd</location>
+      </resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource>
+        <name>Schematron rules for Factur-X 1.09.2 MINIMUM</name>
+        <location>facturx/schematron/FACTUR-X_MINIMUM.sch</location>
+      </resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource>
+        <name>Validation report for ZUGFeRD / Factur-X</name>
+        <location>builtin:default-report</location>
+      </resource>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <scenario>
+    <name>ZUGFeRD / Factur-X (BASIC WL)</name>
+    <description>
+      <p>Validates UN/CEFACT Cross Industry Invoice documents of the ZUGFeRD / Factur-X profile BASIC WL
+        (guideline urn:factur-x.eu:1p0:basicwl).</p>
+      <p>Uses the Factur-X 1.09.2 XML schema and Schematron rules of the profile BASIC WL.</p>
+    </description>
+    <namespace prefix="rsm">urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100</namespace>
+    <namespace prefix="ram">urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/rsm:CrossIndustryInvoice[rsm:ExchangedDocumentContext/ram:GuidelineSpecifiedDocumentContextParameter/ram:ID/text() = 'urn:factur-x.eu:1p0:basicwl'])</match>
+    <validateWithXmlSchema>
+      <resource>
+        <name>XML Schema for Factur-X 1.09.2 BASIC WL</name>
+        <location>facturx/schema/BASIC-WL/FACTUR-X_BASICWL.xsd</location>
+      </resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource>
+        <name>Schematron rules for Factur-X 1.09.2 BASIC WL</name>
+        <location>facturx/schematron/FACTUR-X_BASIC-WL.sch</location>
+      </resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource>
+        <name>Validation report for ZUGFeRD / Factur-X</name>
+        <location>builtin:default-report</location>
+      </resource>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <scenario>
+    <name>ZUGFeRD / Factur-X (BASIC)</name>
+    <description>
+      <p>Validates UN/CEFACT Cross Industry Invoice documents of the ZUGFeRD / Factur-X profile BASIC
+        (guideline urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic).</p>
+      <p>Uses the Factur-X 1.09.2 XML schema and Schematron rules of the profile BASIC.</p>
+    </description>
+    <namespace prefix="rsm">urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100</namespace>
+    <namespace prefix="ram">urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/rsm:CrossIndustryInvoice[rsm:ExchangedDocumentContext/ram:GuidelineSpecifiedDocumentContextParameter/ram:ID/text() = 'urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic'])</match>
+    <validateWithXmlSchema>
+      <resource>
+        <name>XML Schema for Factur-X 1.09.2 BASIC</name>
+        <location>facturx/schema/BASIC/FACTUR-X_BASIC.xsd</location>
+      </resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource>
+        <name>Schematron rules for Factur-X 1.09.2 BASIC</name>
+        <location>facturx/schematron/FACTUR-X_BASIC.sch</location>
+      </resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource>
+        <name>Validation report for ZUGFeRD / Factur-X</name>
+        <location>builtin:default-report</location>
+      </resource>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <scenario>
+    <name>ZUGFeRD / Factur-X (EN 16931)</name>
+    <description>
+      <p>Validates UN/CEFACT Cross Industry Invoice documents of the ZUGFeRD / Factur-X profile EN 16931
+        (guideline urn:cen.eu:en16931:2017).</p>
+      <p>Uses the Factur-X 1.09.2 XML schema and Schematron rules of the profile EN 16931.</p>
+    </description>
+    <namespace prefix="rsm">urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100</namespace>
+    <namespace prefix="ram">urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/rsm:CrossIndustryInvoice[rsm:ExchangedDocumentContext/ram:GuidelineSpecifiedDocumentContextParameter/ram:ID/text() = 'urn:cen.eu:en16931:2017'])</match>
+    <validateWithXmlSchema>
+      <resource>
+        <name>XML Schema for Factur-X 1.09.2 EN 16931</name>
+        <location>facturx/schema/EN16931/FACTUR-X_EN16931.xsd</location>
+      </resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource>
+        <name>Schematron rules for Factur-X 1.09.2 EN 16931</name>
+        <location>facturx/schematron/FACTUR-X_EN16931.sch</location>
+      </resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource>
+        <name>Validation report for ZUGFeRD / Factur-X</name>
+        <location>builtin:default-report</location>
+      </resource>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <scenario>
+    <name>ZUGFeRD / Factur-X (EXTENDED)</name>
+    <description>
+      <p>Validates UN/CEFACT Cross Industry Invoice documents of the ZUGFeRD / Factur-X profile EXTENDED
+        (guideline urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended).</p>
+      <p>Uses the Factur-X 1.09.2 XML schema and Schematron rules of the profile EXTENDED.</p>
+    </description>
+    <namespace prefix="rsm">urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100</namespace>
+    <namespace prefix="ram">urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100</namespace>
+    <namespace prefix="rep">http://www.xoev.de/de/validator/varl/1</namespace>
+    <match>exists(/rsm:CrossIndustryInvoice[rsm:ExchangedDocumentContext/ram:GuidelineSpecifiedDocumentContextParameter/ram:ID/text() = 'urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended'])</match>
+    <validateWithXmlSchema>
+      <resource>
+        <name>XML Schema for Factur-X 1.09.2 EXTENDED</name>
+        <location>facturx/schema/EXTENDED/FACTUR-X_EXTENDED.xsd</location>
+      </resource>
+    </validateWithXmlSchema>
+    <validateWithSchematron>
+      <resource>
+        <name>Schematron rules for Factur-X 1.09.2 EXTENDED</name>
+        <location>facturx/schematron/FACTUR-X_EXTENDED.sch</location>
+      </resource>
+    </validateWithSchematron>
+    <createReport>
+      <resource>
+        <name>Validation report for ZUGFeRD / Factur-X</name>
+        <location>builtin:default-report</location>
+      </resource>
+    </createReport>
+    <acceptMatch>/rep:report/rep:assessment[1]/rep:accept[1]</acceptMatch>
+  </scenario>
+  <noScenarioReport>
+    <resource>
+      <name>Default Report</name>
+      <location>builtin:default-report</location>
+    </resource>
+  </noScenarioReport>
+</scenarios>
