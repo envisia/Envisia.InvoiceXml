@@ -1,0 +1,133 @@
+diff --git a/pom.xml b/pom.xml
+index b33cef3..bea6738 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -42,8 +42,8 @@
+         <version.commons-io>2.22.0</version.commons-io>
+         <version.commons-lang>3.20.0</version.commons-lang>
+         <version.jacoco>0.8.13</version.jacoco>
+-        <version.jaxb-api>4.0.5</version.jaxb-api>
+-        <version.jaxb-impl>4.0.8</version.jaxb-impl>
++        <version.jaxb-api>3.0.1</version.jaxb-api>
++        <version.jaxb-impl>3.0.2</version.jaxb-impl>
+         <version.mockito>5.23.0</version.mockito>
+         <version.owasp-dependency-check>12.1.8</version.owasp-dependency-check>
+         <!-- 6.0.0 requires Java 17+ -->
+@@ -265,7 +265,7 @@
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <version>3.14.0</version>
+                 <configuration>
+-                    <release>11</release>
++                    <release>8</release>
+                     <encoding>UTF-8</encoding>
+                 </configuration>
+             </plugin>
+@@ -566,7 +566,7 @@
+                 <artifactId>maven-javadoc-plugin</artifactId>
+                 <version>3.11.2</version>
+                 <configuration>
+-                    <source>11</source>
++                    <source>8</source>
+                     <doclint>none</doclint>
+                 </configuration>
+                 <executions>
+diff --git a/src/main/java/de/kosit/validationtool/impl/DefaultCheck.java b/src/main/java/de/kosit/validationtool/impl/DefaultCheck.java
+index 0dc5bd6..65bcab7 100644
+--- a/src/main/java/de/kosit/validationtool/impl/DefaultCheck.java
++++ b/src/main/java/de/kosit/validationtool/impl/DefaultCheck.java
+@@ -152,14 +152,20 @@ public class DefaultCheck implements Check {
+                 .map(de.kosit.validationtool.impl.model.Result::getObject).map(Scenario::getConfiguration)
+                 .map(ScenarioType::getCreateReport)
+                 .map(r -> r.getCustomLevel().stream()
+-                        .flatMap(customLevel -> customLevel.getValue().stream().map(id -> Map.entry(id, customLevel.getLevel())))
++                        .flatMap(customLevel -> customLevel.getValue().stream().map(id -> (Map.Entry<String, ErrorLevelType>) new java.util.AbstractMap.SimpleImmutableEntry<>(id, customLevel.getLevel())))
+                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                 .orElse(Collections.emptyMap());
+         // Now check all failed assertions of all schematron validations if they contain a failed assertion with one of
+         // the changed IDs
+-        return schematronResult.stream().flatMap(x -> x.getActivePatternAndFiredRuleAndFailedAssert().stream())
+-                .filter(FailedAssert.class::isInstance).map(FailedAssert.class::cast).filter(fa -> customLevels.containsKey(fa.getId()))
+-                .map(fa -> new CustomFailedAssert(fa, customLevels.get(fa.getId()))).collect(Collectors.toList());
++        final List<CustomFailedAssert> custom = new java.util.ArrayList<>();
++        for (final SchematronOutput output : schematronResult) {
++            for (final Object o : output.getActivePatternAndFiredRuleAndFailedAssert()) {
++                if (o instanceof FailedAssert && customLevels.containsKey(((FailedAssert) o).getId())) {
++                    custom.add(new CustomFailedAssert((FailedAssert) o, customLevels.get(((FailedAssert) o).getId())));
++                }
++            }
++        }
++        return custom;
+     }
+ 
+     @SuppressWarnings("unchecked")
+diff --git a/src/main/java/de/kosit/validationtool/impl/DefaultResult.java b/src/main/java/de/kosit/validationtool/impl/DefaultResult.java
+index 36c3edb..b0dea00 100644
+--- a/src/main/java/de/kosit/validationtool/impl/DefaultResult.java
++++ b/src/main/java/de/kosit/validationtool/impl/DefaultResult.java
+@@ -143,15 +143,30 @@ public class DefaultResult implements Result {
+     }
+ 
+     private <T> List<T> filterSchematronResult(final Class<T> type) {
+-        return this.schematronResult != null
+-                ? this.schematronResult.stream().flatMap(e -> e.getActivePatternAndFiredRuleAndFailedAssert().stream())
+-                        .filter(type::isInstance).map(type::cast).collect(Collectors.toList())
+-                : Collections.emptyList();
++        if (this.schematronResult == null) {
++            return Collections.emptyList();
++        }
++        final List<T> filtered = new java.util.ArrayList<>();
++        for (final org.oclc.purl.dsdl.svrl.SchematronOutput output : this.schematronResult) {
++            for (final Object o : output.getActivePatternAndFiredRuleAndFailedAssert()) {
++                if (type.isInstance(o)) {
++                    filtered.add(type.cast(o));
++                }
++            }
++        }
++        return filtered;
+     }
+ 
+     private boolean isSchematronEvaluated() {
+-        return this.schematronResult != null
+-                && this.schematronResult.stream().noneMatch(e -> e.getActivePatternAndFiredRuleAndFailedAssert().isEmpty());
++        if (this.schematronResult == null) {
++            return false;
++        }
++        for (final org.oclc.purl.dsdl.svrl.SchematronOutput output : this.schematronResult) {
++            if (output.getActivePatternAndFiredRuleAndFailedAssert().isEmpty()) {
++                return false;
++            }
++        }
++        return true;
+     }
+ 
+     @Override
+diff --git a/src/main/java/de/kosit/validationtool/impl/xml/LocalUriResolver.java b/src/main/java/de/kosit/validationtool/impl/xml/LocalUriResolver.java
+index b031dce..7d4703d 100644
+--- a/src/main/java/de/kosit/validationtool/impl/xml/LocalUriResolver.java
++++ b/src/main/java/de/kosit/validationtool/impl/xml/LocalUriResolver.java
+@@ -41,7 +41,7 @@ import net.sf.saxon.trans.XPathException;
+  */
+ public class LocalUriResolver implements URIResolver, UnparsedTextURIResolver {
+ 
+-    private static final Set<String> LOCAL_SCHEMES = Set.of("file", "jar");
++    private static final Set<String> LOCAL_SCHEMES = java.util.Collections.unmodifiableSet(new java.util.HashSet<>(java.util.Arrays.asList("file", "jar")));
+ 
+     @Override
+     public Source resolve(final String href, final String base) throws TransformerException {
+diff --git a/src/main/java/de/kosit/validationtool/impl/xml/ProcessorProvider.java b/src/main/java/de/kosit/validationtool/impl/xml/ProcessorProvider.java
+index 6d39e32..5948b6c 100644
+--- a/src/main/java/de/kosit/validationtool/impl/xml/ProcessorProvider.java
++++ b/src/main/java/de/kosit/validationtool/impl/xml/ProcessorProvider.java
+@@ -79,7 +79,11 @@ public class ProcessorProvider {
+     private static Processor processor;
+ 
+     private static String encode(final String input) {
+-        return URLEncoder.encode(input, StandardCharsets.UTF_8);
++        try {
++            return URLEncoder.encode(input, StandardCharsets.UTF_8.name());
++        } catch (final java.io.UnsupportedEncodingException e) {
++            throw new IllegalStateException(e);
++        }
+     }
+ 
+     public static Processor getProcessor() {
