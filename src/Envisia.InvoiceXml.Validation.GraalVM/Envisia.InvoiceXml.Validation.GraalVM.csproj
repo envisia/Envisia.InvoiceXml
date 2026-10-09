@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Envisia.InvoiceXml.Validation.GraalVM</AssemblyName>
+    <RootNamespace>Envisia.InvoiceXml.Validation.GraalVM</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
+
+    <!-- NuGet package: only packed with -p:PackGraalVM=true once the native libraries of all platforms are in
+         runtimes/ (.github/workflows/graalvm.yml), so packing the solution never produces a package without them -->
+    <IsPackable>false</IsPackable>
+    <IsPackable Condition="'$(PackGraalVM)' == 'true'">true</IsPackable>
+    <GraalVMRuntimeIdentifiers>linux-x64;linux-arm64;win-x64;osx-arm64</GraalVMRuntimeIdentifiers>
+    <PackageId>Envisia.InvoiceXml.Validation.GraalVM</PackageId>
+    <Title>Envisia.InvoiceXml.Validation.GraalVM – the KoSIT validator as a native library for .NET</Title>
+    <Description>Validates electronic invoices (XRechnung, ZUGFeRD / Factur-X, EN 16931) with the official KoSIT validator 1.6.3, compiled ahead of time into a native library with GraalVM native-image: the same engine and reports as the KoSIT validator, without a JVM. Implements IInvoiceValidator of Envisia.InvoiceXml.Validation.Abstractions; contains the XRechnung 3.0.2 and Factur-X 1.09.2 configurations and the native library for linux-x64, linux-arm64, win-x64 and osx-arm64.</Description>
+    <PackageTags>en16931;e-invoice;einvoice;e-rechnung;zugferd;factur-x;xrechnung;validator;validation;kosit;graalvm</PackageTags>
+    <PackageLicenseExpression>Apache-2.0 AND EUPL-1.2 AND MPL-2.0 AND GPL-2.0-only WITH Classpath-exception-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/envisia/ZUGFeRD-csharp/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Envisia.InvoiceXml.Validation.Abstractions\Envisia.InvoiceXml.Validation.Abstractions.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the KoSIT configurations, unpacked on first use (KoSIT loads them from files); the Factur-X configuration
+         uses the XML schemas and compiled Schematron of documentation/zugferd252 and the default report of the
+         XRechnung configuration (copied when unpacking) -->
+    <EmbeddedResource Include="Configurations\**\*">
+      <LogicalName>configurations/$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\','/'))</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\documentation\zugferd252\Schema\**\*.xsd">
+      <LogicalName>configurations/facturx/resources/facturx/xsd/$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\','/'))</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\documentation\zugferd252\XSLT\*.xslt;..\..\documentation\zugferd252\XSLT\*_codedb.xml">
+      <LogicalName>configurations/facturx/resources/facturx/xslt/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the native libraries built by native/build-native.sh (one per platform, CI collects them) -->
+    <None Include="runtimes\**\native\*" Pack="true" PackagePath="runtimes" />
+    <!-- the library of the build platform next to the assembly, for project references and tests -->
+    <None Include="runtimes\$(NETCoreSdkRuntimeIdentifier)\native\*" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" Pack="false" />
+  </ItemGroup>
+
+  <Target Name="CheckGraalVMNativeLibraries" BeforeTargets="GenerateNuspec" Condition="'$(PackGraalVM)' == 'true'">
+    <ItemGroup>
+      <_GraalVMRuntime Include="$(GraalVMRuntimeIdentifiers)" />
+      <_GraalVMMissing Include="@(_GraalVMRuntime)" Condition="!Exists('runtimes\%(Identity)\native\libkosit.so') And !Exists('runtimes\%(Identity)\native\libkosit.dylib') And !Exists('runtimes\%(Identity)\native\kosit.dll')" />
+    </ItemGroup>
+    <Error Condition="'@(_GraalVMMissing)' != ''" Text="The native KoSIT library is missing for: @(_GraalVMMissing). Build it with native/build-native.sh on each platform (.github/workflows/graalvm.yml)." />
+  </Target>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\NOTICE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Envisia.InvoiceXml.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001001b51094fa4770806adadd97d5b2a5529a3c5e1bdd14cb7756bf566457dbddcc1a7cd4be17e865498c3ec56cdc673f71af9647502cf523c314bad15d7331d2e8b79213e50afde60fc2220b886cb825a2154e441dd743a6c0b23219f1c6f3ca9628f1c4f2ec503d4774330ae4a634e4ef727acbfc18e3aa2d01c75dfe53577a4d5" />
+    <InternalsVisibleTo Include="Envisia.InvoiceXml.Validation.GraalVM.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001001b51094fa4770806adadd97d5b2a5529a3c5e1bdd14cb7756bf566457dbddcc1a7cd4be17e865498c3ec56cdc673f71af9647502cf523c314bad15d7331d2e8b79213e50afde60fc2220b886cb825a2154e441dd743a6c0b23219f1c6f3ca9628f1c4f2ec503d4774330ae4a634e4ef727acbfc18e3aa2d01c75dfe53577a4d5" />
+  </ItemGroup>
+</Project>

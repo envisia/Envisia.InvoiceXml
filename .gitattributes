@@ -5,3 +5,5 @@
 # to native line endings on checkout.
 *.cs text
 *.xml text
+# shell scripts run in Git Bash on Windows as well
+*.sh text eol=lf

@@ -25,3 +25,19 @@ parties, which keep their licenses:
   and OASIS UBL 2.1 schemas (Copyright OASIS Open).
 
 See src/Envisia.InvoiceXml.Validation/Resources/THIRD-PARTY-NOTICES.md.
+
+The native library of Envisia.InvoiceXml.Validation.GraalVM is the KoSIT validator
+compiled with GraalVM native-image and contains, besides the validation artefacts
+above, third-party software under its own licenses:
+
+- KoSIT XML Validator 1.6.3 (https://github.com/itplr-kosit/validator),
+  Copyright 2017-2026 Koordinierungsstelle für IT-Standards (KoSIT), licensed under
+  the Apache License, Version 2.0, with its bundled libraries (Apache Commons,
+  Jansi, picocli, XML Resolver: Apache License 2.0; Eclipse JAXB and Jakarta APIs:
+  Eclipse Distribution License 1.0; SLF4J: MIT License).
+- Saxon-HE 12.9 (https://github.com/Saxonica/Saxon-HE), Saxonica, licensed under
+  the Mozilla Public License 2.0.
+- Classes of GraalVM Community Edition 25 (https://www.graalvm.org/), licensed under
+  the GNU General Public License v2 with the Classpath Exception.
+
+See src/Envisia.InvoiceXml.Validation.GraalVM/THIRD-PARTY-NOTICES.md.

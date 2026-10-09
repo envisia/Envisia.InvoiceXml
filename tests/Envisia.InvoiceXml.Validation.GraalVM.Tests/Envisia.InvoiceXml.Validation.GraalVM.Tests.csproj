@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Tests of Envisia.InvoiceXml.Validation.GraalVM: the IInvoiceValidator contract (shared with the .NET
+    implementation) and the KoSIT conformance suite (tests/KositConformance). Needs the native library of the
+    platform (src/Envisia.InvoiceXml.Validation.GraalVM/native/build-native.sh) and, for the conformance suite, the
+    test data (tests/KositConformance/prepare-testdata.sh). Run by .github/workflows/graalvm.yml on every platform.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Envisia.InvoiceXml.Validation.GraalVM.Tests</RootNamespace>
+
+    <!-- signed like the libraries for access to the internals (KositXml) -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.0.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Envisia.InvoiceXml\Envisia.InvoiceXml.csproj" />
+    <ProjectReference Include="..\..\src\Envisia.InvoiceXml.Validation.GraalVM\Envisia.InvoiceXml.Validation.GraalVM.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\InvoiceValidatorContractTests.cs" Link="Shared\InvoiceValidatorContractTests.cs" />
+    <Compile Include="..\KositConformance\src\*.cs" Link="KositConformance\%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

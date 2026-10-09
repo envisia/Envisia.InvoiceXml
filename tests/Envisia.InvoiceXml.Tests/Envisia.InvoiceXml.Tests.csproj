@@ -35,6 +35,9 @@
   <!-- the validation package targets .NET 10 only; on .NET 8 only the library itself is tested -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <ProjectReference Include="..\..\src\Envisia.InvoiceXml.Validation\Envisia.InvoiceXml.Validation.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <!-- the IInvoiceValidator contract, shared with the tests of Envisia.InvoiceXml.Validation.GraalVM -->
+    <Compile Include="..\Shared\InvoiceValidatorContractTests.cs" Link="Validation\InvoiceValidatorContractTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
     <Compile Remove="Validation\**" />
