@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Prototype: .NET binding for the KoSIT validator compiled with GraalVM native-image (build-native.sh). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Envisia.KositNative</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- copied to the output of every project that references this one -->
+    <None Include="../../build/native/libkosit.so" Link="libkosit.so" CopyToOutputDirectory="PreserveNewest" Condition="Exists('../../build/native/libkosit.so')" />
+    <None Include="../../build/native/libkosit.dylib" Link="libkosit.dylib" CopyToOutputDirectory="PreserveNewest" Condition="Exists('../../build/native/libkosit.dylib')" />
+    <None Include="../../build/native/kosit.dll" Link="kosit.dll" CopyToOutputDirectory="PreserveNewest" Condition="Exists('../../build/native/kosit.dll')" />
+  </ItemGroup>
+</Project>
