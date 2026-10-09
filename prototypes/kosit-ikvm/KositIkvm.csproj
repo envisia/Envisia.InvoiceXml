@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**;build/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

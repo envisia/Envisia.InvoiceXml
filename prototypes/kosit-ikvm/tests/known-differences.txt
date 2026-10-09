@@ -1,0 +1,3 @@
+# Documents whose IKVM report differs from the JVM reference: <id> TAB <reason>
+eInvoicing-EN16931/cii/examples/CII_example6.xml	The XML schema validator of the Java 8 class library of IKVM rejects the invalid xsi:schemaLocation (odd number of URIs) that Java 21 ignores, so the document is rejected instead of accepted.
+validator-configuration-xrechnung/src/test/instances/processing-valid/ubl005.xml	Wording of the XML schema message only (Java 8 prints cbc:DueDate, Java 21 the expanded name); same result.

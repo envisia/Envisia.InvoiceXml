@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The KoSIT prototype conformance tests (prototypes/kosit-testsuite) run against the IKVM conversion. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.0.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
+    <PackageReference Include="IKVM" Version="8.16.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- built by ../build-kosit.sh -->
+    <IkvmReference Include="../lib/kosit-validator-java8.jar">
+      <AssemblyName>Kosit.Validator</AssemblyName>
+      <AssemblyVersion>1.6.3.0</AssemblyVersion>
+      <AssemblyFileVersion>1.6.3.0</AssemblyFileVersion>
+    </IkvmReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../../kosit-testsuite/src/*.cs" Link="Shared/%(Filename)%(Extension)" />
+    <None Include="known-differences.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

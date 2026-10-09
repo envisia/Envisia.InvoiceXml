@@ -68,6 +68,26 @@ Other observations:
   these documents.
 - The rebuilt KoSIT is a patched fork that has to be maintained for each KoSIT release.
 
+## Tests
+
+`tests/` runs the shared conformance suite of `prototypes/kosit-testsuite` (see its README) against this
+prototype. It covers report parity with KoSIT on the JVM for 230 documents, the 327 assertions of the XRechnung
+configuration's own tests and the 1,146 CEN EN 16931 unit tests through the converted Saxon.
+
+```shell
+XRECHNUNG_CONFIGURATION=<unpacked configuration release> ../kosit-testsuite/prepare-testdata.sh
+./build-kosit.sh
+dotnet test tests/KositIkvm.Tests.csproj -c Release
+```
+
+Result: **535 passed, 2 skipped as known differences, 0 failed** (537 tests, 47 s):
+
+- all 25 reports of the configuration's own tests meet their 327 assertions,
+- all CEN unit tests give the same results as Saxon on the JVM,
+- 228 of 230 reports are identical to the JVM reference; the 2 known differences (`tests/known-differences.txt`)
+  are `CII_example6` (invalid `xsi:schemaLocation`, rejected by the Java 8 schema validator) and the wording of
+  one XML schema message (`ubl005`).
+
 ## Running it
 
 Requirements: .NET 10 SDK, git, a JDK (11 or newer) and Maven to build the KoSIT jar.
