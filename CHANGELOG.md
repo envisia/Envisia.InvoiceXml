@@ -37,7 +37,7 @@ First release of **Envisia.InvoiceXml**, based on ZUGFeRD-csharp 18.0.0
 
 ### Added
 
-- New package **Envisia.InvoiceXml.Validation**: validates invoice XML against the official XML schemas and
+- New package **Envisia.InvoiceXml.Validation** (.NET 10): validates invoice XML against the official XML schemas and
   Schematron rules and creates reports in the format of the KoSIT validator (XML report and HTML report in
   German or English). Built-in configurations:
   - XRechnung 3.0.2: port of the KoSIT validator configuration (release 2026-08-31) with the CEN EN 16931

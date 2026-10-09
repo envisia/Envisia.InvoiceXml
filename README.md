@@ -51,7 +51,8 @@ dotnet add package Envisia.InvoiceXml
 dotnet add package Envisia.InvoiceXml.Validation   # optional, the validator
 ```
 
-Target frameworks: .NET 10, .NET 8, .NET Standard 2.0/2.1, .NET Framework 4.6.2 and 4.8.
+Target frameworks: .NET 10, .NET 8, .NET Standard 2.0/2.1, .NET Framework 4.6.2 and 4.8
+(Envisia.InvoiceXml.Validation: .NET 10).
 
 ## Quick start
 

@@ -9,7 +9,7 @@ XRechnung.
 dotnet add package Envisia.InvoiceXml.Validation
 ```
 
-Target frameworks: .NET 10, .NET 8, .NET Standard 2.0 and .NET Framework 4.6.2.
+Target framework: .NET 10.
 
 The package runs entirely in .NET. It contains an XPath 2.0/3.1 engine and an ISO Schematron
 implementation that execute the official Schematron sources, so neither Java nor an XSLT processor is
