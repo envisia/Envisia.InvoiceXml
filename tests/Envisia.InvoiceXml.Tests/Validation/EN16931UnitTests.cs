@@ -83,8 +83,8 @@ namespace Envisia.InvoiceXml.Tests.Validation
                     }
                 }
             }
-            Assert.IsTrue(tests > 0, "no tests found");
-            Assert.AreEqual(0, failures.Count, failures.Count + " of " + tests + " unit tests failed:\n" + string.Join("\n", failures));
+            Assert.IsGreaterThan(0, tests, "no tests found");
+            Assert.IsEmpty(failures, failures.Count + " of " + tests + " unit tests failed:\n" + string.Join("\n", failures));
         }
     }
 }

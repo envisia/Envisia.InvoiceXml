@@ -26,7 +26,7 @@ namespace Envisia.InvoiceXml.Validation.XPath
     /// </summary>
     internal interface IVariableResolver
     {
-        bool TryResolve(string expandedName, out Sequence value);
+        public bool TryResolve(string expandedName, out Sequence value);
     }
 
 
@@ -38,7 +38,7 @@ namespace Envisia.InvoiceXml.Validation.XPath
         /// <summary>
         /// Returns the document with the given absolute URI, or throws an exception if it cannot be loaded.
         /// </summary>
-        XdmDocument Resolve(string absoluteUri);
+        public XdmDocument Resolve(string absoluteUri);
     }
 
 

@@ -72,7 +72,7 @@ namespace Envisia.InvoiceXml.Tests.Validation
             }
             string[] expressions = File.ReadAllLines(TestDataPath("xpath-expressions.txt"));
             string[] expected = File.ReadAllLines(TestDataPath("xpath-expected.txt"));
-            Assert.AreEqual(expressions.Length, expected.Length);
+            Assert.HasCount(expressions.Length, expected);
 
             List<string> failures = new List<string>();
             for (int i = 0; i < expressions.Length; i++)
@@ -83,7 +83,7 @@ namespace Envisia.InvoiceXml.Tests.Validation
                     failures.Add($"{expressions[i]}\n    expected {expected[i]}\n    actual   {actual}");
                 }
             }
-            Assert.AreEqual(0, failures.Count, failures.Count + " of " + expressions.Length + " expressions differ from Saxon:\n" + string.Join("\n", failures));
+            Assert.IsEmpty(failures, failures.Count + " of " + expressions.Length + " expressions differ from Saxon:\n" + string.Join("\n", failures));
         }
     }
 }

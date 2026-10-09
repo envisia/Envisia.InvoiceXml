@@ -105,7 +105,7 @@ namespace Envisia.InvoiceXml.Tests.Validation
         public void ReportsMatchKositValidator()
         {
             Dictionary<string, List<string>> reference = _LoadReference();
-            Assert.IsTrue(reference.Count > 150, "reference results missing");
+            Assert.IsGreaterThan(150, reference.Count, "reference results missing");
             InvoiceXmlValidator xrechnung = new InvoiceXmlValidator(ValidatorConfiguration.XRechnung);
             InvoiceXmlValidator facturX = new InvoiceXmlValidator(ValidatorConfiguration.FacturX);
 
@@ -126,7 +126,7 @@ namespace Envisia.InvoiceXml.Tests.Validation
                     }
                 }
             }
-            Assert.AreEqual(0, failures.Count, failures.Count + " of " + reference.Count + " reports differ from the KoSIT validator:\n" + string.Join("\n", failures.Take(20)));
+            Assert.IsEmpty(failures, failures.Count + " of " + reference.Count + " reports differ from the KoSIT validator:\n" + string.Join("\n", failures.Take(20)));
         }
     }
 }
