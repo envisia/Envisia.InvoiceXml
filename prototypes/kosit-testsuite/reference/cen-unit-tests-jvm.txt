@@ -1,0 +1,1 @@
+Invoice-unit-UBL/BR-CO-25.xml	test 6: BR-CO-25 expected as fatal, found 0
