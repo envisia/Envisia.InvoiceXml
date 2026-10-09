@@ -50,6 +50,15 @@ First release of **Envisia.InvoiceXml**, based on ZUGFeRD-csharp 18.0.0
   the KoSIT validator or directly (`SchematronSchema`, SVRL output). `InvoiceDescriptor.ValidateXml()` validates
   an invoice in a given version, profile and syntax. Tested against the unit tests of the CEN artefacts and the
   reports of the KoSIT validator for the XRechnung test suite and the official Factur-X samples.
+- New package **Envisia.InvoiceXml.Validation.Abstractions** (.NET 10): `IInvoiceValidator` and
+  `InvoiceValidationResult` (recommendation, scenario, messages, KoSIT XML and HTML report), implemented by
+  `InvoiceXmlValidator`. Both validation packages register it with `services.AddInvoiceValidator()`, so the
+  implementation is chosen by the package reference.
+- New package **Envisia.InvoiceXml.Validation.GraalVM** (.NET 10): the official KoSIT validator 1.6.3, compiled
+  ahead of time into a native library with GraalVM native-image (linux-x64, linux-arm64, win-x64, osx-arm64; no
+  JVM needed), with the KoSIT configuration for XRechnung 3.0.2 and a Factur-X 1.09.2 configuration. Its reports
+  equal those of the KoSIT validator on the JVM for the XRechnung test suite, the tests of the XRechnung
+  configuration, the CEN unit tests and the official Factur-X samples (`tests/KositConformance`).
 - `ZUGFeRDVersion.Version25` for ZUGFeRD 2.5 / Factur-X 1.09 (2.5.2 / 1.09.2). It uses the same guideline identifiers
   as `Version23` and additionally writes the EXTENDED elements introduced with Factur-X 1.09:
   - debtor BIC (`PayerSpecifiedDebtorFinancialInstitution`) and debtor account name,

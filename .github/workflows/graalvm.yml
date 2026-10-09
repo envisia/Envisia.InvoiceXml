@@ -1,0 +1,132 @@
+# Builds the native KoSIT library of Envisia.InvoiceXml.Validation.GraalVM on every platform (GraalVM native-image
+# cannot cross-compile), tests it there with the contract and KoSIT conformance tests, and packs the NuGet package
+# with the libraries of all platforms. release.yml calls this workflow with the version to publish.
+name: GraalVM
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'src/Envisia.InvoiceXml.Validation.Abstractions/**'
+    - 'src/Envisia.InvoiceXml.Validation.GraalVM/**'
+    - 'tests/Envisia.InvoiceXml.Validation.GraalVM.Tests/**'
+    - 'tests/KositConformance/**'
+    - 'tests/Shared/**'
+    - 'documentation/zugferd252/**'
+    - '.github/workflows/graalvm.yml'
+  pull_request:
+    paths:
+    - 'src/Envisia.InvoiceXml.Validation.Abstractions/**'
+    - 'src/Envisia.InvoiceXml.Validation.GraalVM/**'
+    - 'tests/Envisia.InvoiceXml.Validation.GraalVM.Tests/**'
+    - 'tests/KositConformance/**'
+    - 'tests/Shared/**'
+    - 'documentation/zugferd252/**'
+    - '.github/workflows/graalvm.yml'
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        description: Package version (a leading "v" is removed); the version of Directory.Build.props if empty
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  native:
+    name: native (${{ matrix.rid }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: ubuntu-latest
+          rid: linux-x64
+        - os: ubuntu-24.04-arm
+          rid: linux-arm64
+        - os: windows-latest
+          rid: win-x64
+        - os: macos-latest
+          rid: osx-arm64
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # the same bytes on every platform (test documents, configurations)
+    - run: git config --global core.autocrlf false
+
+    - uses: actions/checkout@v5
+
+    - name: Setup GraalVM
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '25'
+        distribution: graalvm-community
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Build the native library
+      run: src/Envisia.InvoiceXml.Validation.GraalVM/native/build-native.sh
+
+    - name: Prepare the conformance test data
+      run: tests/KositConformance/prepare-testdata.sh
+
+    - name: Test
+      run: dotnet test tests/Envisia.InvoiceXml.Validation.GraalVM.Tests --configuration Release --verbosity normal
+
+    - name: Upload the native library
+      uses: actions/upload-artifact@v4
+      with:
+        name: graalvm-${{ matrix.rid }}
+        path: src/Envisia.InvoiceXml.Validation.GraalVM/runtimes/${{ matrix.rid }}/native/*
+        if-no-files-found: error
+
+  pack:
+    needs: native
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Download the native libraries
+      uses: actions/download-artifact@v4
+      with:
+        pattern: graalvm-*
+        path: native
+
+    - name: Pack
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        for rid in linux-x64 linux-arm64 win-x64 osx-arm64; do
+          mkdir -p "src/Envisia.InvoiceXml.Validation.GraalVM/runtimes/$rid/native"
+          cp "native/graalvm-$rid/"* "src/Envisia.InvoiceXml.Validation.GraalVM/runtimes/$rid/native/"
+        done
+        version=()
+        if [ -n "$VERSION" ]; then version=("-p:Version=${VERSION#v}"); fi
+        dotnet pack src/Envisia.InvoiceXml.Validation.GraalVM --configuration Release --output artifacts -p:PackGraalVM=true "${version[@]}"
+
+    - name: Upload the package
+      uses: actions/upload-artifact@v4
+      with:
+        name: graalvm-package
+        path: artifacts/*
+        if-no-files-found: error

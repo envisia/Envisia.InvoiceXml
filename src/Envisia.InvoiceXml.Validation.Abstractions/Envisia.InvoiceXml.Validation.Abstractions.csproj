@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Envisia.InvoiceXml.Validation.Abstractions</AssemblyName>
+    <RootNamespace>Envisia.InvoiceXml.Validation</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\Envisia.InvoiceXml.snk</AssemblyOriginatorKeyFile>
+
+    <!-- NuGet package -->
+    <IsPackable>true</IsPackable>
+    <PackageId>Envisia.InvoiceXml.Validation.Abstractions</PackageId>
+    <Title>Envisia.InvoiceXml.Validation.Abstractions – invoice validator interfaces</Title>
+    <Description>Interfaces and result model for validating electronic invoices (XRechnung, ZUGFeRD / Factur-X, EN 16931) with reports in the format of the KoSIT validator. Implemented by Envisia.InvoiceXml.Validation (pure .NET) and Envisia.InvoiceXml.Validation.GraalVM (the KoSIT validator compiled to a native library).</Description>
+    <PackageTags>en16931;e-invoice;einvoice;e-rechnung;zugferd;factur-x;xrechnung;validator;validation;kosit</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/envisia/ZUGFeRD-csharp/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\NOTICE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

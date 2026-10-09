@@ -27,6 +27,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Envisia.InvoiceXml\Envisia.InvoiceXml.csproj" />
+    <ProjectReference Include="..\Envisia.InvoiceXml.Validation.Abstractions\Envisia.InvoiceXml.Validation.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

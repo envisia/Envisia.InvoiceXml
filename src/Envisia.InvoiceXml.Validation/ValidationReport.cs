@@ -28,38 +28,6 @@ using Envisia.InvoiceXml.Validation.Schematron;
 namespace Envisia.InvoiceXml.Validation
 {
     /// <summary>
-    /// The level of a validation message.
-    /// </summary>
-    public enum ValidationLevel
-    {
-        /// <summary>Information, does not affect the validity.</summary>
-        Information,
-
-        /// <summary>Warning: the document is not valid, but it is acceptable.</summary>
-        Warning,
-
-        /// <summary>Error: the document is rejected.</summary>
-        Error
-    }
-
-
-    /// <summary>
-    /// The recommendation of the validator.
-    /// </summary>
-    public enum AcceptRecommendation
-    {
-        /// <summary>The validation could not be completed (processing error).</summary>
-        Undefined,
-
-        /// <summary>The document can be accepted and processed.</summary>
-        Accept,
-
-        /// <summary>The document should be rejected.</summary>
-        Reject
-    }
-
-
-    /// <summary>
     /// A message of a validation step (rep:message of the KoSIT report).
     /// </summary>
     public sealed class ValidationMessage
@@ -222,6 +190,15 @@ namespace Envisia.InvoiceXml.Validation
         internal AcceptRecommendation Assessment;
         internal ReportLanguage Language;
         internal bool IncludeDocumentContent;
+
+
+        /// <summary>
+        /// The result in the implementation independent model of <see cref="IInvoiceValidator"/>.
+        /// </summary>
+        public InvoiceValidationResult ToInvoiceValidationResult()
+        {
+            return InvoiceValidationResult.FromReport(ToXml().ToString(SaveOptions.DisableFormatting), Recommendation);
+        }
 
 
         /// <summary>

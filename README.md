@@ -15,6 +15,8 @@ ZUGFeRD / Factur-X invoice) is intentionally left to the PDF library of your cho
 |---|---|
 | [Envisia.InvoiceXml](https://www.nuget.org/packages/Envisia.InvoiceXml) | Create and read invoice XML |
 | [Envisia.InvoiceXml.Validation](https://www.nuget.org/packages/Envisia.InvoiceXml.Validation) | Validate invoice XML with the official XSD and Schematron rules of XRechnung, ZUGFeRD / Factur-X and EN 16931; reports like the KoSIT validator. Pure .NET, no Java |
+| [Envisia.InvoiceXml.Validation.GraalVM](https://www.nuget.org/packages/Envisia.InvoiceXml.Validation.GraalVM) | Alternative implementation: the official KoSIT validator, compiled into a native library with GraalVM (no JVM needed) |
+| [Envisia.InvoiceXml.Validation.Abstractions](https://www.nuget.org/packages/Envisia.InvoiceXml.Validation.Abstractions) | `IInvoiceValidator`, implemented by both validation packages (`services.AddInvoiceValidator()`) |
 
 ## Supported standards
 
@@ -125,7 +127,10 @@ if (!report.IsAcceptable)
 report.SaveHtml("report.html");
 ```
 
-See [Validation](docs/validation.md) for the configurations, the report and custom rules.
+See [Validation](docs/validation.md) for the configurations, the report and custom rules. With
+dependency injection, `services.AddInvoiceValidator()` registers `IInvoiceValidator`; reference
+`Envisia.InvoiceXml.Validation.GraalVM` instead to validate with the official KoSIT validator itself
+(compiled into a native library, no JVM needed).
 
 `InvoiceValidator.Validate(invoice, ZUGFeRDVersion.Version23)` in the main package only recalculates line
 totals, allowances/charges, the VAT breakdown and the document totals (BR-CO-*) of an `InvoiceDescriptor`
@@ -173,7 +178,10 @@ If Envisia.InvoiceXml is useful for you, please consider sponsoring its developm
 
 Licensed under the [Apache License 2.0](LICENSE). The validation package embeds the official
 validation artefacts under their own licenses (the CEN EN 16931 Schematron rules under the EUPL 1.2),
-see [THIRD-PARTY-NOTICES.md](src/Envisia.InvoiceXml.Validation/Resources/THIRD-PARTY-NOTICES.md).
+see [THIRD-PARTY-NOTICES.md](src/Envisia.InvoiceXml.Validation/Resources/THIRD-PARTY-NOTICES.md). The
+native library of Envisia.InvoiceXml.Validation.GraalVM contains the KoSIT validator (Apache 2.0), Saxon-HE
+(MPL 2.0) and GraalVM classes (GPL v2 with the Classpath Exception), see
+[its THIRD-PARTY-NOTICES.md](src/Envisia.InvoiceXml.Validation.GraalVM/THIRD-PARTY-NOTICES.md).
 
 Envisia.InvoiceXml is a derivative of [ZUGFeRD-csharp](https://github.com/stephanstapel/ZUGFeRD-csharp)
 by Stephan Stapel / STwo Industries GmbH and its contributors. See [NOTICE](NOTICE).

@@ -71,7 +71,7 @@ namespace Envisia.InvoiceXml.Validation
     /// report.SaveHtml("invoice-report.html");
     /// </code>
     /// </example>
-    public sealed class InvoiceXmlValidator
+    public sealed class InvoiceXmlValidator : IInvoiceValidator
     {
         private static readonly string _EngineName = "Envisia.InvoiceXml.Validation " + _Version();
         private readonly IReadOnlyList<ValidatorConfiguration> _Configurations;
@@ -310,6 +310,15 @@ namespace Envisia.InvoiceXml.Validation
             report.Assessment = ReportWriter.ComputeAssessment(report);
             report.Recommendation = _Accept(report, scenario);
             return report;
+        }
+
+
+        /// <summary>
+        /// Validates the XML document (<see cref="IInvoiceValidator"/>).
+        /// </summary>
+        InvoiceValidationResult IInvoiceValidator.Validate(byte[] document, string documentName)
+        {
+            return Validate(document, documentName).ToInvoiceValidationResult();
         }
 
 

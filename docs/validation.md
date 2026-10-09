@@ -15,6 +15,38 @@ The package runs entirely in .NET. It contains an XPath 2.0/3.1 engine and an IS
 implementation that execute the official Schematron sources, so neither Java nor an XSLT processor is
 needed, and no network access happens during validation.
 
+## Implementations and dependency injection
+
+The interface `IInvoiceValidator` and its result `InvoiceValidationResult` are in
+**Envisia.InvoiceXml.Validation.Abstractions**. Two packages implement it; reference one of them:
+
+| Package | Engine |
+|---|---|
+| `Envisia.InvoiceXml.Validation` | Pure .NET: own XPath and Schematron engine running the official rules (this page) |
+| [`Envisia.InvoiceXml.Validation.GraalVM`](../src/Envisia.InvoiceXml.Validation.GraalVM/README.md) | The official KoSIT validator 1.6.3, compiled into a native library with GraalVM native-image (linux-x64, linux-arm64, win-x64, osx-arm64) |
+
+Both register the validator as a singleton with the same method, so switching means replacing the
+package reference:
+
+```csharp
+services.AddInvoiceValidator();
+
+public sealed class InvoiceInbox(IInvoiceValidator validator)
+{
+    public bool Accept(byte[] xml) => validator.Validate(xml, "invoice.xml").IsAcceptable;
+}
+```
+
+`InvoiceValidationResult` contains the recommendation, the matched scenario, every message (rule id,
+level, text, location, step) and the report in the format of the KoSIT validator (`ReportXml`,
+`GetReportHtml()`). Both implementations pass the same tests
+(`tests/Shared/InvoiceValidatorContractTests.cs`) and choose the scenario the same way. The .NET
+implementation is about five times faster (5.5 ms against 25–28 ms per document on one thread) and
+needs half the memory; the GraalVM package runs the KoSIT validator itself and also KoSIT
+configurations with compiled Schematron (XSLT) or own report stylesheets. In the .NET implementation
+`AddInvoiceValidator(options)` takes `ValidatorOptions`, and `InvoiceXmlValidator` also offers the
+richer `ValidationReport` described below.
+
 ## Validating a document
 
 ```csharp
@@ -180,3 +212,8 @@ the CEN EN 16931 Schematron rules are licensed under the EUPL 1.2, the XRechnung
 configuration under the Apache License 2.0; the Factur-X, UN/CEFACT and OASIS UBL schemas are
 redistributed under the terms of their publishers. See
 [THIRD-PARTY-NOTICES.md](../src/Envisia.InvoiceXml.Validation/Resources/THIRD-PARTY-NOTICES.md).
+
+The native library of Envisia.InvoiceXml.Validation.GraalVM additionally contains the KoSIT validator
+(Apache License 2.0), Saxon-HE (MPL 2.0) and classes of GraalVM Community Edition (GPL v2 with the
+Classpath Exception), see
+[its THIRD-PARTY-NOTICES.md](../src/Envisia.InvoiceXml.Validation.GraalVM/THIRD-PARTY-NOTICES.md).
