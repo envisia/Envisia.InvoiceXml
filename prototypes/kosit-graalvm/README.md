@@ -53,15 +53,22 @@ dotnet test tests/KositGraalVm.Tests.csproj -c Release
 - all 1,146 CEN EN 16931 unit tests give the same results as Saxon on the JVM,
 - concurrent validations equal sequential ones.
 
-Performance with the XRechnung configuration, 159 documents, 4-core container:
+Performance, measured back to back on the same 159 documents with the XRechnung configuration (4-core container,
+single runs, expect about ±20 %). "Warmed up" is the steady state after several passes over the documents:
 
-| | GraalVM native library | IKVM (#3) | Java KoSIT on the JVM | Envisia.InvoiceXml.Validation (#2) |
+| | Native C# (#2) | GraalVM native library | KoSIT on the JVM (Java 21) | IKVM (#3) |
 |---|---|---|---|---|
-| Loading the configuration | 6.2–6.4 s | 15–17 s | (25 s in total for start, load and 159 documents) | about 2 s |
-| Per document, one thread, warmed up | 26–30 ms | 40–52 ms | | about 8 ms |
-| Per document, 4 threads | 8.6–9.3 ms | | | |
-| Peak working set | about 650 MB | about 800 MB | | about 380 MB (all configurations) |
-| Size | 55 MB `libkosit.so` | 96 MB | JVM + 11 MB jar | one DLL with the rules |
+| Loading the configuration | 3.2 s | 6–12 s | 8–11 s (+ JVM start) | 14–15 s |
+| First pass, 1 thread | 14–16 ms per document | 40–53 ms | 42–56 ms | 75 ms |
+| Warmed up, 1 thread | 5.5 ms | 25–28 ms | 15–16 ms | 45–48 ms |
+| Warmed up, 4 threads | 4.3 ms | 8.5–9.5 ms | 5–6 ms | 20–23 ms |
+| Memory | 300 MB peak working set | 650–675 MB | 650–690 MB heap in use | 870–940 MB |
+| Size | one DLL with the rules | 55 MB `libkosit.so` | JVM + 11 MB jar | 96 MB |
+
+The native library starts faster than the JVM and needs no warm-up, but once the JVM's JIT compiler has warmed up,
+the JVM is about 1.7 times faster: native-image compiles ahead of time without runtime profiles (GraalVM
+Community has no profile-guided optimization and uses the serial garbage collector). It is about twice as fast as
+IKVM.
 
 ## Limits and open points
 
