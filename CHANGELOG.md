@@ -37,6 +37,19 @@ First release of **Envisia.InvoiceXml**, based on ZUGFeRD-csharp 18.0.0
 
 ### Added
 
+- New package **Envisia.InvoiceXml.Validation**: validates invoice XML against the official XML schemas and
+  Schematron rules and creates reports in the format of the KoSIT validator (XML report and HTML report in
+  German or English). Built-in configurations:
+  - XRechnung 3.0.2: port of the KoSIT validator configuration (release 2026-08-31) with the CEN EN 16931
+    Schematron 1.3.16 and the XRechnung Schematron 2.6.0,
+  - ZUGFeRD 2.5.2 / Factur-X 1.09.2: XSD and Schematron of all profiles,
+  - EN 16931: any CIUS in UBL and CII with the CEN rules.
+
+  The Schematron sources are executed by an own XPath 2.0/3.1 and ISO Schematron engine (no Java), which
+  follows the semantics of Saxon-HE 12. Custom rules can be used with scenario configurations in the format of
+  the KoSIT validator or directly (`SchematronSchema`, SVRL output). `InvoiceDescriptor.ValidateXml()` validates
+  an invoice in a given version, profile and syntax. Tested against the unit tests of the CEN artefacts and the
+  reports of the KoSIT validator for the XRechnung test suite and the official Factur-X samples.
 - `ZUGFeRDVersion.Version25` for ZUGFeRD 2.5 / Factur-X 1.09 (2.5.2 / 1.09.2). It uses the same guideline identifiers
   as `Version23` and additionally writes the EXTENDED elements introduced with Factur-X 1.09:
   - debtor BIC (`PayerSpecifiedDebtorFinancialInstitution`) and debtor account name,

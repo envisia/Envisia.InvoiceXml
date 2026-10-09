@@ -1,4 +1,4 @@
-# Publishes Envisia.InvoiceXml to nuget.org when a version tag (v1.2.3, v1.2.3-preview.1, ...) is pushed.
+# Publishes Envisia.InvoiceXml and Envisia.InvoiceXml.Validation to nuget.org when a version tag (v1.2.3, v1.2.3-preview.1, ...) is pushed.
 #
 # Uses nuget.org Trusted Publishing (no long-lived API key):
 #   1. On nuget.org open "Trusted Publishing" and add a policy for this repository
@@ -46,7 +46,7 @@ jobs:
       run: dotnet test Envisia.InvoiceXml.sln --configuration Release --no-build
 
     - name: Pack
-      run: dotnet pack src/Envisia.InvoiceXml/Envisia.InvoiceXml.csproj --configuration Release --no-build --output artifacts -p:Version=${{ steps.version.outputs.version }}
+      run: dotnet pack Envisia.InvoiceXml.sln --configuration Release --no-build --output artifacts -p:Version=${{ steps.version.outputs.version }}
 
     - name: NuGet login
       id: login

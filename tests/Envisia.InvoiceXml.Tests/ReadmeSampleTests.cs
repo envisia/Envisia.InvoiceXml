@@ -25,7 +25,7 @@ namespace Envisia.InvoiceXml.Tests
     [TestClass]
     public class ReadmeSampleTests : TestBase
     {
-        private static InvoiceDescriptor _CreateReadmeInvoice()
+        internal static InvoiceDescriptor _CreateReadmeInvoice()
         {
             // --- copy of the README quick start ---
             InvoiceDescriptor invoice = InvoiceDescriptor.CreateInvoice("471102", new DateTime(2026, 3, 5), CurrencyCodes.EUR);
